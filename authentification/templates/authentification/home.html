@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - LITRevu</title>
+</head>
+<body>
+    <h1>Page d'accueil</h1>
+    <p>Bienvenue sur LITRevu !</p>
+    <p>
+        <a href="{% url 'login' %}">Se connecter</a> |
+        <a href="{% url 'signup' %}">S'inscrire</a> |
+        <a href = "{% url 'logout' %}">Se déconnecter</a>
+    </p>
+</body>
+</html>
