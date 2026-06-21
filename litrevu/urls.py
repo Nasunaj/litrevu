@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import RedirectView
 import authentification.views
+import reviews.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,5 +26,9 @@ urlpatterns = [
     path('login/',authentification.views.login_page, name='login'),
     path('logout/',authentification.views.logout_page, name='logout'),
     path('home/',authentification.views.home, name='home'),
+    path('tickets/',reviews.views.ticket_list, name='ticket_list'),
+    path('tickets/add/',reviews.views.ticket_create, name='ticket_create'),
+    path('tickets/<int:ticket_id>/delete/',reviews.views.ticket_delete, name='ticket_delete'),
+    path('tickets/<int:ticket_id>/edit/',reviews.views.ticket_update, name='ticket_update'),
     # path('', RedirectView.as_view(url='login/')),  # Redirige / vers /login au lieu d'arriver sur http://127.0.0.1:8000/
 ]
