@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import TicketForm
-from .models import Ticket
+from .forms import TicketForm, ReviewForm
+from .models import Ticket, Review
 
 
 @login_required
@@ -57,3 +57,53 @@ def ticket_delete(request,ticket_id):
         messages.success("Billet supprimé.")
         return redirect('ticket_list')
     return render(request, 'reviews/ticket_delete.html', {'ticket': ticket})
+
+
+# ----- Reviews-------------
+@login_required
+def review_list(request):
+    reviews = Review.objects.filter(user=request.user)
+    return render(request,'reviews/review_list.html',{'reviews':reviews})
+
+@login_required
+def review_create(request):
+    if request.method == 'POST':
+        form = ReviewForm(request.POST,user = request.user)
+        if form.is_valid():
+            # Comme il manque user on prépare la base sans sanvegarder
+            review = form.save(commit=False)
+            review.user = request.user # on ajouter user (celui qui connecté ici)
+            review.save() # enfin on sauvegarde
+            messages.success(request,"Critique ajoutée.")
+            return redirect('review_list')
+        else:
+            messages.error("Veuillez corriger les erreurs ci-dessous")
+    else:
+        form = ReviewForm(user = request.user)
+        return render(request, 'reviews/review_form.html', {'form': form, 'action': 'Ajouter'})
+
+@login_required
+def review_update(request,review_id):
+    review = get_object_or_404(Review,id=review_id,user=request.user)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST,instance=review, user = request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"Critique modifiée.")
+            return redirect('review_list')
+        else:
+            messages.error("Veuillez corriger les erreurs ci-dessous")
+    else:
+        form = ReviewForm(instance=review, user = request.user)
+        return render(request,'reviews/review_form.html', {'form': form, 'action': 'Valider la modification','review': review})
+
+@login_required
+def review_delete(request,review_id):
+    review = get_object_or_404(Review,id=review_id,user=request.user)
+    if request.method == 'POST':
+        review.delete()
+        messages.success(request,"Critique supprimée.")
+        return redirect('review_list')
+    return render(request, 'reviews/review_delete.html', {'review': review})
+
+
