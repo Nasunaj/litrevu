@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes abonnements - LITRevu</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'authentification/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">Mes abonnements</div>
+        <div class="logo-container">
+            <div class="logo">LITRevu</div>
+        </div>
+        <div class="content">
+            <div class="right-session">
+                <a href="{% url 'user_list' %}" class="sign-up-btn">
+                    Trouver des utilisateurs
+                </a>
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <h2>Les utilisateurs suivis</h2>
+                {% if followed_users %}
+                    <ul>
+                        {% for user in followed_users %}
+                            <li>
+                                <p>{{ user.followed_user.username }}</p>
+                                <a href="{% url 'unfollow_user' user.followed_user.id %}" class="sign-up-btn">Se désabonner</a>
+                                <br><br>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                <p>Aucun utilisateur suivi</p>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+           <!-- <a href="{% url 'login' %}">Se connecter</a> |
+            <a href="{% url 'signup' %}">S'inscrire</a> |-->
+            <a href = "{% url 'logout' %}">Se déconnecter</a>
+    </div>
+    </div>
+</body>
+
+</body>
+</html>

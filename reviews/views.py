@@ -1,8 +1,9 @@
 from django.contrib import messages
+from authentification.models import User
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import TicketForm, ReviewForm
-from .models import Ticket, Review
+from .models import Ticket, Review, UserFollows
 
 
 @login_required
@@ -106,4 +107,51 @@ def review_delete(request,review_id):
         return redirect('review_list')
     return render(request, 'reviews/review_delete.html', {'review': review})
 
+
+# ----------- Follow -------------
+
+# Vue pour la liste de tous les utilisateurs en excluant soi-même
+@login_required
+def user_list(request):
+    users = User.objects.exclude(id=request.user.id)
+    return render(request, 'reviews/user_list.html', {'users': users})
+
+# Vue pour suivre un utilisateur
+@login_required
+def follow_user(request,user_id):
+    user_to_follow = get_object_or_404(User,id=user_id)
+
+    if user_to_follow == request.user:
+        messages.error(request,"Il n'est pas possible de se suivre soi-même.")
+        return redirect('user_list')
+
+    if UserFollows.objects.filter(user=request.user, followed_user=user_to_follow).exists():
+        messages.error(request,f"Vous suivez déjà {user_to_follow.username}.")
+        return redirect('user_list')
+
+    # Création du suivi
+    UserFollows.objects.create(user=request.user, followed_user=user_to_follow)
+    messages.success(request,f"Vous suivez maintenant {user_to_follow.username}.")
+    return redirect('user_list')
+
+# Vue pour se désabonner d'un utilisateur
+@login_required
+def unfollow_user(request,user_id):
+    user_to_unfollow = get_object_or_404(User,id=user_id)
+
+    # Vérification : est ce que le suivi existe?
+    follow_relationship = UserFollows.objects.filter(user=request.user, followed_user=user_to_unfollow).first()
+    if not follow_relationship:
+        messages.error(request,f"Vous ne suivez pas {user_to_unfollow.username}.")
+        return redirect('followed_users_list')
+
+    # Suppression du suivi
+    follow_relationship.delete()
+    messages.success(request,f"Vous ne suivez pas {user_to_unfollow.username}.")
+    return redirect('followed_users_list')
+
+@login_required
+def followed_users_list(request):
+    followed_users = request.user.following.all()
+    return render(request, 'reviews/followed_users_list.html', {'followed_users': followed_users})
 
