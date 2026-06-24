@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.db.models import Q # pour les requêtes
+
 from authentification.models import User
 from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -155,3 +157,51 @@ def followed_users_list(request):
     followed_users = request.user.following.all()
     return render(request, 'reviews/followed_users_list.html', {'followed_users': followed_users})
 
+
+# Vues pr flux personnalisé
+@login_required
+def feed(request):
+    # On va récupérer l'ensemble des données nécessaires
+    current_user = request.user # l'utilisateur connecté
+
+    # les utilisateurs suivi par current_user
+    followed_users = current_user.following.values_list('followed_user', flat=True)
+
+    # les billets (ceux de current_user et ceux des utilisateurs qu'il suit)
+    tickets = Ticket.objects.filter(
+        Q(user = current_user) | Q(user__in=followed_users)
+    ).distinct().order_by('-time_created')
+
+    # Les critiques (de current_user et celles des utilisateurs qu'il suit et les critiques sur les billets de current_user)
+    reviews = Review.objects.filter(
+        Q(user = current_user) | Q(user__in=followed_users) | Q(ticket__user = current_user)
+    )
+
+    # Fusion dans une seule liste
+    combined = []
+    for ticket in tickets:
+        me = 1 if ticket.user == current_user else 0
+        combined.append({
+            'type': 'ticket',
+            'object': ticket,
+            'time_created': ticket.time_created,
+            'me':me
+        })
+    for review in reviews:
+        me = 1 if review.user == current_user else 0
+        combined.append({
+            'type': 'review',
+            'object': review,
+            'time_created': review.time_created,
+            'me':me
+        })
+
+    combined.sort(key=lambda x: x['time_created'], reverse=True)
+
+    return render(request, 'reviews/feed.html', {'combined': combined})
+
+@login_required
+def ticket_reviews(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    reviews = Review.objects.filter(ticket=ticket).order_by('-time_created')
+    return render(request, 'reviews/ticket_reviews.html', {'ticket':ticket,'reviews': reviews})

@@ -16,8 +16,8 @@ body {
 .container {
     background-color: white;
     border: 1px solid #ccc;
-    width: 810px;
-    height: 600px;
+    width: 1024px;
+    /*height: 600px;*/
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -123,4 +123,17 @@ body {
 .messages {
     color: red;
     margin: 10px 0;
+}
+
+
+.feed-container {
+    display: flex;
+    gap: 20px;  /* Espace entre les colonnes */
+    padding: 20px;
+    width: 100%;  /* Prend toute la largeur disponible */
+}
+
+.feed-column {
+    flex: 1;  /* Chaque colonne prend la moitié de l'espace */
+    min-width: 0;  /* Évite les problèmes de débordement */
 }

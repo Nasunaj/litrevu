@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Critiques pour {{ ticket.title }} - LITRevu</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'authentification/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">Critiques pour {{ ticket.title }}</div>
+        <div class="logo-container">
+            <div class="logo">LITRevu</div>
+        </div>
+        <div class="content">
+            <div class="right-session">
+                <a href="{% url 'feed' %}" class="sign-up-btn">Retour au flux</a>
+                <h2>{{ ticket.title }}</h2>
+                 <p>{{ ticket.description }}</p>
+                <p>Auteur : {{ ticket.user.username }}</p>
+                <p>Créé le : {{ticket.time_created}}</p>
+                <h3>Critiques</h3>
+                {% if reviews %}
+                    <ul>
+                        {% for review in reviews %}
+                        <li>
+                            <p>Note : {{ review.rating}}/5</p>
+                            <p>Titre : {{ review.headline }}</p>
+                            <p>{{ review.body }}</p>
+                            <p>Auteur : {{ review.user.username }}</p>
+                            <p>{{ review.time_created }}</p>
+                            <hr>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                <p>Aucune critique pour ce billet.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+           <!-- <a href="{% url 'login' %}">Se connecter</a> |
+            <a href="{% url 'signup' %}">S'inscrire</a> |-->
+            <a href = "{% url 'logout' %}">Se déconnecter</a>
+    </div>
+    </div>
+</body>
+</html>

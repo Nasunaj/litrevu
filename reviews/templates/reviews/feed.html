@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon flux - LITRevu</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'authentification/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">Mon flux</div>
+        <div class="logo-container">
+            <div class="logo">LITRevu</div>
+        </div>
+        <div class="content">
+            <div class="feed-container">
+                <div class="feed-column">
+                    <h2>Billets</h2>
+                    {% if combined %}
+                        {% for item in combined %}
+                            {% if item.type == 'ticket' %}
+                            <div class="ticket">
+                                <h3>{{ item.object.title }}</h3>
+                                <p>{{ item.object.description }}</p>
+                                <p>Auteur : {{ item.object.user.username }}</p>
+                                <p>Créé le : {{item.object.time_created}}</p>
+                                {% if item.object.image %}
+                                    <img src="{{ item.object.image.url }}" alt="image du billet : {{ item.object.title }}" width="100">
+                                {% endif %}
+                                    <a href="{% url 'ticket_reviews' ticket_id=item.object.id %}" class="sign-up-btn">Voir les critiques</a>
+                                <br><br>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                    <p>Vide</p>
+                    {% endif %}
+                </div>
+                <div class="feed-column">
+                    <h2>Critiques</h2>
+                    {% if combined %}
+                        {% for item in combined %}
+                            {% if item.type == 'review' %}
+                                <div class="review">
+                                    <h3>{{ item.object.headline }}</h3>
+                                    <p>Note : {{ item.object.rating }}/5</p>
+                                    <p>{{ item.object.body }}</p>
+                                    <p>Auteur : {{ item.object.user.username }}</p>
+                                    <p>Pour le billet :
+                                        <a href="{% url 'ticket_reviews' ticket_id=item.object.ticket.id %}">{{ item.object.ticket.title }}</a>
+                                    </p>
+                                    <p>Créé le : {{item.object.time_created}}</p>
+                                    <br><br>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                    <p>Vide</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div>
+           <!-- <a href="{% url 'login' %}">Se connecter</a> |
+            <a href="{% url 'signup' %}">S'inscrire</a> |-->
+            <a href = "{% url 'logout' %}">Se déconnecter</a>
+    </div>
+    </div>
+</body>
+</html>

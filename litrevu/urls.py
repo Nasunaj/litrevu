@@ -35,12 +35,16 @@ urlpatterns = [
     path('reviews',reviews.views.review_list, name='review_list'),
     path('reviews/add/',reviews.views.review_create, name='review_create'),
     path('reviews/<int:review_id>/delete/',reviews.views.review_delete, name='review_delete'),
-    path('reveiws/<int:review_id>/edit/',reviews.views.review_update, name='review_update'),
+    path('reviews/<int:review_id>/edit/',reviews.views.review_update, name='review_update'),
 
     # follow
     path('users/',reviews.views.user_list, name='user_list'),
     path('users/follow/<int:user_id>/',reviews.views.follow_user,name='follow_user'),
     path('users/unfollow/<int:user_id>/',reviews.views.unfollow_user,name='unfollow_user'),
     path('users/followed/',reviews.views.followed_users_list, name='followed_users_list'),
+
+    # flux
+    path('feed/',reviews.views.feed, name='feed'),
+    path('tickets/<int:ticket_id>/reviews',reviews.views.ticket_reviews, name='ticket_reviews'),
     # path('', RedirectView.as_view(url='login/')),  # Redirige / vers /login au lieu d'arriver sur http://127.0.0.1:8000/
 ]
