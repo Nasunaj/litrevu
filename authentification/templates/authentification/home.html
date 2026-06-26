@@ -1,17 +1,38 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accueil - LITRevu</title>
-</head>
-<body>
-    <h1>Page d'accueil</h1>
-    <p>Bienvenue sur LITRevu !</p>
-    <p>
-        <a href="{% url 'login' %}">Se connecter</a> |
-        <a href="{% url 'signup' %}">S'inscrire</a> |
-        <a href = "{% url 'logout' %}">Se déconnecter</a>
-    </p>
-</body>
-</html>
+{% extends 'authentification/base.html' %}
+
+{% block title %}Accueil - LITReview{% endblock %}
+
+{% block content %}
+    <div class="content">
+        <div class="right-session">
+            <h2>Tableau de bords</h2>
+
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-box">
+                    <h3>Mes billets</h3>
+                    <p>{{ tickets_count }}</p>
+                    <a href="{% url 'ticket_list' %}">Voir les billets</a>
+                </div>
+                <div class="stat-box">
+                    <h3>Mes critiques</h3>
+                    <p>{{ reviews_count }}</p>
+                    <a href="{% url 'review_list' %}">Voir les critiques</a>
+                </div>
+                <div class="stat-box">
+                    <h3>Utilisateurs suivis</h3>
+                    <p>{{ followed_users_count }}</p>
+                    <a href="{% url 'followed_users_list' %}">Voir mes abonnements</a>
+                </div>
+            </div>
+
+            <!-- Autres liens -->
+            <div class="quick-links">
+                <h3>Liens rapides</h3>
+                <a href="{% url 'feed' %}" class="sign-up-btn">Mon flux personnalisé</a>
+                <a href="{% url 'user_list' %}" class="sign-up-btn">Trouver des utilisateurs</a>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

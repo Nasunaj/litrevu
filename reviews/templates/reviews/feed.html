@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Mon flux - LITRevu</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'authentification/styles.css' %}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">Mon flux</div>
-        <div class="logo-container">
-            <div class="logo">LITRevu</div>
-        </div>
+{% extends 'authentification/base.html' %}
+
+{% block title %}Mon flux - LITReview{% endblock %}
+
+{% block content %}
         <div class="content">
             <div class="feed-container">
                 <div class="feed-column">
@@ -27,7 +18,9 @@
                                 {% if item.object.image %}
                                     <img src="{{ item.object.image.url }}" alt="image du billet : {{ item.object.title }}" width="100">
                                 {% endif %}
-                                    <a href="{% url 'ticket_reviews' ticket_id=item.object.id %}" class="sign-up-btn">Voir les critiques</a>
+                                    <p>
+                                        <a href="{% url 'ticket_reviews' ticket_id=item.object.id %}" class="sign-up-btn">Voir les critiques</a>
+                                    </p>
                                 <br><br>
                             </div>
                             {% endif %}
@@ -61,10 +54,5 @@
             </div>
         </div>
         <div>
-           <!-- <a href="{% url 'login' %}">Se connecter</a> |
-            <a href="{% url 'signup' %}">S'inscrire</a> |-->
-            <a href = "{% url 'logout' %}">Se déconnecter</a>
     </div>
-    </div>
-</body>
-</html>
+{% endblock %}

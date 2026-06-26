@@ -1,18 +1,8 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utilisateurs à suivre - LITRevu</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'authentification/styles.css' %}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">Utilisateur à suivre</div>
-        <div class="logo-container">
-            <div class="logo">LITRevu</div>
-        </div>
+{% extends 'authentification/base.html' %}
+
+{% block title %}Utilisateurs à suivre - LITReview{% endblock %}
+
+{% block content %}
         <div class="content">
             <div class="right-session">
                 <a href="{% url 'followed_users_list' %}" class="sign-up-btn">
@@ -30,8 +20,10 @@
                     <ul>
                         {% for user in users %}
                             <li>
-                                <p>{{ user.username }}</p>
-                                <a href="{% url 'follow_user' user.id %}" class="sign-up-btn">Suivre</a>
+                                <p>
+                                    {{ user.username }}
+                                    <a href="{% url 'follow_user' user.id %}" class="sign-up-btn">Suivre</a>
+                                </p>
                                 <br><br>
                             </li>
                         {% endfor %}
@@ -41,13 +33,4 @@
                 {% endif %}
             </div>
         </div>
-        <div>
-           <!-- <a href="{% url 'login' %}">Se connecter</a> |
-            <a href="{% url 'signup' %}">S'inscrire</a> |-->
-            <a href = "{% url 'logout' %}">Se déconnecter</a>
-    </div>
-    </div>
-</body>
-
-</body>
-</html>
+{% endblock %}

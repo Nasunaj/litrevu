@@ -1,21 +1,15 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Mes billets - LITRevu</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'authentification/styles.css' %}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">Mes billets</div>
-        <div class="logo-container">
-            <div class="logo">LITRevu</div>
-        </div>
+{% extends 'authentification/base.html' %}
+
+{% block title %}Mes billets - LITReview{% endblock %}
+
+{% block content %}
         <div class="content">
             <div class="right-session">
                 <a href="{% url 'ticket_create' %}" class="sign-up-btn">
                     Ajouter un billet
+                </a>
+                <a href="{% url 'ticket_and_with_review' %}" class="sign-up-btn">
+                    Ajouter un billet accompagné d'une critique
                 </a>
                 {% if messages %}
                     <div class="messages">
@@ -32,6 +26,7 @@
                                 <h3>{{ ticket.title }}</h3>
                                 <p>{{ ticket.description }}</p>
                                 <p>Créé le : {{ticket.time_created}}</p>
+                                <a href="{% url 'ticket_reviews' ticket_id=ticket.id %}" class="sign-up-btn">Voir les critiques</a>
                                 <a href="{% url 'ticket_update' ticket.id %}" class="sign-up-btn">Modifier</a>
                                 <a href="{% url 'ticket_delete' ticket.id %}" class="sign-up-btn">Supprimer</a>
                                 <br><br>
@@ -43,11 +38,5 @@
                 {% endif %}
             </div>
         </div>
-        <div>
-           <!-- <a href="{% url 'login' %}">Se connecter</a> |
-            <a href="{% url 'signup' %}">S'inscrire</a> |-->
-            <a href = "{% url 'logout' %}">Se déconnecter</a>
-    </div>
-    </div>
-</body>
-</html>
+{% endblock %}
+

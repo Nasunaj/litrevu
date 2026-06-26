@@ -1,18 +1,8 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ action }} un billet - LITRevu</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'authentification/styles.css' %}">
-</head>
-<body>
-    <div id="container">
-        <div id="header">{{ action }} un billet</div>
-        <div class="logo-container">
-            <div class="logo">LITRevu</div>
-        </div>
+{% extends 'authentification/base.html' %}
+
+{% block title %}{{ action }} un billet - LITReview{% endblock %}
+
+{% block content %}
         <div class="content">
             <div class="right-session">
                 {% if messages %}
@@ -24,13 +14,24 @@
                 {% endif %}
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    {{ form.as_p}}
-                    <button type="submit" class="login-btn">{{ action }}</button>
+                    <p>
+                        <label for="{{ form.title.id_for_label }}">Titre :</label>
+                    <p>{{ form.title }}</p>
+                    </p>
+                    <br>
+                    <p>
+                        <label for="{{ form.description.id_for_label }}">Description :</label>
+                    <p>{{ form.description }}</p>
+                    </p>
+                    <br>
+                    <p>
+                        <label for="{{ form.image.id_for_label }}">Image de couverture :</label>
+                    <p>{{ form.image }}</p>
+                    </p>
+                    <!--{{ form.as_p}}-->
+                    <button type="submit" class="sign-up-btn">{{ action }}</button>
                     <a href="{% url 'ticket_list' %}" class="sign-up-btn">Annuler</a>
                 </form>
             </div>
         </div>
-        <a href = "{% url 'logout' %}">Se déconnecter</a>
-    </div>
-</body>
-</html>
+{% endblock %}

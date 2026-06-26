@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -123,3 +123,8 @@ AUTH_USER_MODEL = 'authentification.User'
 LOGIN_URL = 'login'
 
 # LOGIN_REDIRECT_URL = 'home'
+
+# Settings for uploaded files (images, etc.)
+MEDIA_URL = '/media/'  # Settings for uploaded files (images, etc.)
+# Absolute path to the media folder
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

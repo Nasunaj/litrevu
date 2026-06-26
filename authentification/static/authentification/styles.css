@@ -1,84 +1,134 @@
+/*Définition des variables globales*/
+:root {
+    --line-height-base:1.5;/*better to read*/
+    --bottom-color:black;
+    --font-size-xs:0.75rem;
+    --font-size-md:1.07rem;
+    --color_black: light-dark(#000000, #ffffff);
+    --padding_percent-xs:5%;
+    --padding_percent-md:10%;
+    --pading_rem_xs:0.313rem;/*5px*/
+    --pading_rem_s:0.625rem;/*10px*/
+    --pading_rem_md:1.25rem;/*20px*/
+    --pading_rem_lg:2.5rem;/*40px*/
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: Helvetica;
+    line-height: var(--line-height-base);
+    box-sizing: border-box;
 }
 
 body {
     background-color: #f4f4f4;
     display: flex;
     justify-content: center;
-    align-items: center;
+    vertical-align: middle;
+    padding: var(--padding_percent-xs) var(--padding_percent-md);
     height: 100vh;
 }
 
 .container {
     background-color: white;
-    border: 1px solid #ccc;
-    width: 1024px;
-    /*height: 600px;*/
+    border: 1px solid var(--bottom-color);
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .header {
-    background-color: #e9e9e9;
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ccc;
-    font-size: 14px;
-    color: #333;
+    /*background-color: #e9e9e9;*/
+    display: flex;
+    padding: var(--pading_rem_s);
+    justify-content: space-between;  /* Espace entre les deux éléments */
+    align-items: center;  /* Centre verticalement */
+    border-bottom: 1px solid var(--bottom-color);
+    font-size: var(--font-size-xs);
+    color: var(--color_black);
+}
+.header-nav {
+    order: 1;  /* .header-nav sera à droite */
+    display: flex;
+    gap: 1rem;
 }
 
+.header-user {
+    order: 2;  /* .header-user sera à gauche */
+}
+
+
+/* Style pour les liens de navigation */
+.nav-link {
+    color: var(--color_black);
+    text-decoration: none;
+    padding: var(--pading_rem_xs) var(--pading_rem_s);
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #f4f4f4;
+    color: #000;
+}
+
+/*.header_title {
+    position: relative;
+    left: 0.6rem;
+}*/
+
 .logo-container {
-    padding: 20px;
+    padding: var(--pading_rem_md);
     text-align: center;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--bottom-color);
 }
 
 .logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
+    font-size: var(--font-size-xs);
+    color:  var(--color_black);
 }
 
 .content {
     flex: 1;
     display: flex;
-    padding: 40px;
-    gap: 40px;
+    padding: var(--pading_rem_lg);
+    gap: var(--pading_rem_lg);
 }
 
 .left-section {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /*justify-content: center;*/
     align-items: center;
+    padding-top: var(--padding_percent-md);
 }
 
 .right-section {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+   /* justify-content: center;*/
+    padding-top: var(--padding_percent-xs);
 }
 
 .sign-up-title {
-    font-size: 20px;
-    margin-bottom: 20px;
-    color: #333;
+    font-size: var(--font-size-md);
+    margin-bottom: var(--pading_rem_md);
+    color: var(--color_black);
 }
 
 .sign-up-btn {
-    padding: 10px 20px;
-    border: 1px solid #ccc;
+    padding: var(--pading_rem_s) var(--pading_rem_md);
+    border: 1px solid var(--bottom-color);
     background-color: white;
     cursor: pointer;
-    font-size: 14px;
-    color: #333;
+    font-size: var(--font-size-xs);
+    color: var(--color_black);
     text-decoration: none;
     display: inline-block;
     text-align: center;
@@ -89,30 +139,34 @@ body {
 }
 
 .login-title {
-    font-size: 20px;
-    margin-bottom: 20px;
-    color: #333;
+    font-size: var(--font-size-md);
+    color: var(--color_black);
+    margin: 0 auto;
+    padding-bottom: var(--padding_percent-md);
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
+
 }
 
 .input-field {
     padding: 10px;
-    border: 1px solid #ccc;
-    font-size: 14px;
+    border: 1px solid var(--bottom-color);
+    font-size: var(--font-size-xs);
+    color: var(--color_black);
+    margin: 0.5rem;
 }
 
 .login-btn {
     padding: 10px 20px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--bottom-color);
     background-color: white;
     cursor: pointer;
-    font-size: 14px;
-    color: #333;
+    font-size: var(--font-size-md);
+    color: var(--color_black);
     align-self: flex-end;
 }
 

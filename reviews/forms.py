@@ -4,50 +4,100 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from .models import Ticket, Review
 
 
-# Creation d'un formulaire
+# Creating a form
 class TicketForm(forms.ModelForm):
     '''
     Form for creating a new ticket.
     '''
     class Meta:
         model = Ticket
-        fields = ['title', 'description','image']
+        fields = ['title', 'description', 'image']
         widgets = {
-            # Pour avoir un champs de description plus grand
+            # To have a larger description field
             'description': forms.Textarea(attrs={'rows': 4}),
         }
+
 
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['ticket', 'rating','headline','body']
+        fields = ['ticket', 'rating', 'headline', 'body']
         widgets = {
-            'body': forms.Textarea(attrs={'rows': 4}), # Champs + grds pr txt
+            'body': forms.Textarea(attrs={'rows': 4}),
         }
 
-    # personnaliser le comportement du formulaire Django
-    # *args : arg1, arg2,etc.
-    # **kwargs : user=request.user, data=request.POST,etc.
-    # ces arguments sont transmis au constructeur parent -> ModelForm.__init__
+    # customize the Django form's behavior
+    # *args: arg1, arg2, etc.
+    # **kwargs: user=request.user, data=request.POST, etc.
+    # these arguments are passed to the parent constructor ->
+    # ModelForm.__init__
     def __init__(self, *args, **kwargs):
-        # pr récupérer la valeur de user dans kwargs, pop permet de supprimer
-        # la clé et retourne uniquement la valeur, None si user n'exsite pas.
-        user = kwargs.pop('user',None)
+        # to retrieve the 'user' value from kwargs; pop removes
+        # the key and returns only the value, or None if 'user' does not exist
+        user = kwargs.pop('user', None)
 
-        # pr appeler le constructeur parent (ModelForm.__init__).
-        # Ce qui permet à Django --> construction normale du formulaire
-        # (charger les champs, appliquer les widgets, etc.).
+        # to call the parent constructor (ModelForm.__init__).
+        # This allows Django --> to build the form normally
+        # (loading fields, applying widgets, etc.).
         super(ReviewForm, self).__init__(*args, **kwargs)
         if user:
-            # Ticket.objects.filter(user=user) retourne seulement les tickets
-            # de user
-            # self.fields->un dictionnaire contenant tous les champs du formulaire
-            # self.fields['ticket'] : pr accèder au champ ticket du formulaire
-            # queryset -> permet de filtrer directement dans la base de données
-            # pour éviter de charger des données inutiles en RAM.
-            # remarque : filter(), all(), get() sont vu comme pour séléctionner
-            # donc ne modifie pas la base originale
+            # Ticket.objects.filter(user=user) returns only the tickets
+            # belonging to the user
+            # self.fields -> a dictionary containing all form fields
+            # self.fields['ticket'] : to access the form's 'ticket' field
+            # queryset -> allows filtering directly in the database
+            # to avoid loading unnecessary data into RAM.
+            # note: filter(), all(), and get() are selection methods
+            # so they do not modify the original database.
             self.fields['ticket'].queryset = Ticket.objects.filter(user=user)
-            # Encadrer les notes avec un min et un max
+            # Bound the scores with a minimum and a maximum.
             self.fields['rating'].validators.append(MinValueValidator(1))
             self.fields['rating'].validators.append(MaxValueValidator(5))
+
+
+class TicketWithReviewForm(forms.Form):
+    # Ticket fields
+    title = forms.CharField(max_length=128, label="Titre du billet")
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 4}),
+        label="Description du billet",
+        required=False
+    )
+    image = forms.ImageField(
+        label="Image de couverture",
+        required=False
+    )
+
+    # Champs pour la critique
+    rating = forms.IntegerField(
+        label="Note (1-5)",
+        min_value=1,
+        max_value=5,
+        widget=forms.NumberInput(attrs={'min': 1, 'max': 5})
+    )
+    headline = forms.CharField(max_length=128, label="Titre de la critique")
+    body = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 4}),
+        label="Texte de la critique"
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)  # Retrieves the logged-in user
+        super(TicketWithReviewForm, self).__init__(*args, **kwargs)
+
+    def save(self):
+        ticket = Ticket.objects.create(
+            title=self.cleaned_data['title'],
+            description=self.cleaned_data['description'],
+            user=self.user,
+            image=self.cleaned_data.get('image')
+        )
+        # Creation of the associated review
+        review = Review.objects.create(
+            ticket=ticket,
+            rating=self.cleaned_data['rating'],
+            headline=self.cleaned_data['headline'],
+            body=self.cleaned_data['body'],
+            user=self.user
+        )
+        return ticket, review

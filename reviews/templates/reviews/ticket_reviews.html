@@ -1,20 +1,10 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Critiques pour {{ ticket.title }} - LITRevu</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'authentification/styles.css' %}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">Critiques pour {{ ticket.title }}</div>
-        <div class="logo-container">
-            <div class="logo">LITRevu</div>
-        </div>
+{% extends 'authentification/base.html' %}
+
+{% block title %}Critiques pour {{ ticket.title }} - LITReview{% endblock %}
+
+{% block content %}
         <div class="content">
             <div class="right-session">
-                <a href="{% url 'feed' %}" class="sign-up-btn">Retour au flux</a>
                 <h2>{{ ticket.title }}</h2>
                  <p>{{ ticket.description }}</p>
                 <p>Auteur : {{ ticket.user.username }}</p>
@@ -38,11 +28,4 @@
                 {% endif %}
             </div>
         </div>
-        <div>
-           <!-- <a href="{% url 'login' %}">Se connecter</a> |
-            <a href="{% url 'signup' %}">S'inscrire</a> |-->
-            <a href = "{% url 'logout' %}">Se déconnecter</a>
-    </div>
-    </div>
-</body>
-</html>
+{% endblock %}

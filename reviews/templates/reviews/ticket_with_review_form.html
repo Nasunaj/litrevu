@@ -1,0 +1,56 @@
+{% extends 'authentification/base.html' %}
+
+{% block title %}Créer un billet avec une critique - LITReview{% endblock %}
+
+{% block content %}
+        <div class="content">
+            <div class="right-section">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- Section pour le billet -->
+                    <fieldset>
+                        <legend>Billet</legend>
+                        <div>
+                            <label for="{{ form.title.id_for_label }}">Titre :</label>
+                            <p>{{ form.title }}<p>
+                        </div>
+                        <div>
+                            <label for="{{ form.description.id_for_label }}">Description :</label>
+                            <p>{{ form.description }}</p>
+                        </div>
+                        <div>
+                            <label for="{{ form.image.id_for_label }}">Image de couverture :</label>
+                            <p>{{ form.image }}</p>
+                        </div>
+                    </fieldset>
+                    <br>
+                    <!-- Section pour la critique -->
+                    <fieldset>
+                        <legend>Critique associée</legend>
+                        <div>
+                            <label for="{{ form.rating.id_for_label }}">Note (1-5) :</label>
+                            <p>{{ form.rating }}</p>
+                        </div>
+                        <div>
+                            <label for="{{ form.headline.id_for_label }}">Titre :</label>
+                            <p>{{ form.headline }}</p>
+                        </div>
+                        <div>
+                            <label for="{{ form.body.id_for_label }}">Commentaire :</label>
+                            <p>{{ form.body }}</p>
+                        </div>
+                    </fieldset>
+                    <br>
+                    <button type="submit" class="sign-up-btn">Ajouter</button>
+                    <a href="{% url 'feed' %}" class="sign-up-btn">Annuler</a>
+                </form>
+            </div>
+        </div>
+{% endblock %}
