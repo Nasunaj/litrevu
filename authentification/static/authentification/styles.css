@@ -28,14 +28,14 @@ body {
     justify-content: center;
     vertical-align: middle;
     padding: var(--padding_percent-xs) var(--padding_percent-md);
-    height: 100vh;
+    /*height: 100vh;*/
 }
 
 .container {
     background-color: white;
     border: 1px solid var(--bottom-color);
     width: 100%;
-    height: 100%;
+    /*height: 100%;*/
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -175,10 +175,10 @@ body {
 }
 
 .messages {
-    color: red;
+    /*color: red;*/
+    background-color:rgba(250,250,250,1);
     margin: 10px 0;
 }
-
 
 .feed-container {
     display: flex;

@@ -1,7 +1,7 @@
 {% extends 'authentification/base.html' %}
 
 {% block title %}Mes billets - LITReview{% endblock %}
-
+{% block h1_title %}Mes billets{% endblock %}
 {% block content %}
         <div class="content">
             <div class="right-session">
@@ -14,7 +14,7 @@
                 {% if messages %}
                     <div class="messages">
                         {% for message in messages %}
-                        <p>{{ message }}</p>
+                        <p style="color: rgba(97,0,0,1);">{{ message }}</p>
                         {% endfor %}
                     </div>
                 {% endif %}

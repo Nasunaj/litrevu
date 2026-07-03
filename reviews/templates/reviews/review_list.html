@@ -1,7 +1,7 @@
 {% extends 'authentification/base.html' %}
 
 {% block title %}Mes critiques - LITReview{% endblock %}
-
+{% block h1_title %}Mes critiques{% endblock %}
 {% block content %}
         <div class="content">
             <div class="right-session">
@@ -11,7 +11,7 @@
                 {% if messages %}
                     <div class="messages">
                         {% for message in messages %}
-                        <p>{{ message }}</p>
+                        <p style="color: rgba(97,0,0,1);">{{ message }}</p>
                         {% endfor %}
                     </div>
                 {% endif %}
@@ -22,7 +22,7 @@
                             <li>
                                 <h3>{{ review.headline }}</h3>
                                 <p>Note : {{ review.rating }}/5</p>
-                                <p>Pour le billet : <a href="#"{{review.ticket.title}}></a></p>
+                                <p>Pour le billet : <a href="{% url 'ticket_reviews' ticket_id=review.ticket.id %}">{{review.ticket.title}}</a></p>
                                 <p>{{ review.body }}</p>
                                 <p>Créé le : {{ review.time_created }}</p>
                                 <a href="{% url 'review_update' review.id %}" class="sign-up-btn">Modifier</a>

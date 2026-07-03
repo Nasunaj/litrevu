@@ -1,3 +1,5 @@
+"""Views for the authentification application."""
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -10,6 +12,18 @@ from reviews.models import Ticket, Review, UserFollows
 # in settings.py LOGIN_URL = 'login'
 @login_required
 def home(request):
+    """Display the personalized home page for the logged-in user.
+
+    This view retrieves and displays the user's statistics:
+    - Number of tickets created.
+    - Number of reviews published.
+    - Number of users followed.
+
+    :arg request: (HttpRequest) Object containing the http request data.
+
+    :return: (HttpResponse) Rendered HTML page using the template
+    authentification/home.html with the user's statistics in the context.
+    """
     user = request.user
     tickets_count = Ticket.objects.filter(user=user).count()
     reviews_count = Review.objects.filter(user=user).count()
@@ -24,6 +38,17 @@ def home(request):
 
 
 def signup(request):
+    """Handle the registration of a new user.
+
+    This view processes POST requests to create a user account. If the form is
+    valid, the user is created, automatically logged-in and redirected to the
+    home page. If else error, message is displayed.
+
+    :arg request: (HttpRequest) Object containing the http request data
+    :return: (HttpResponse)
+    - Redirected to the home page if registration is succeeds.
+    - Rendered HTML page using the template.
+    """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -40,6 +65,19 @@ def signup(request):
 
 
 def login_page(request):
+    """Handle the login of a user.
+
+    This view processes POST requests to authenticate a user. If the
+    identifants are valid, the user is logged in and redirected to the URL
+    specified by the next parameter (or to the 'home' page by default).
+    In case of an error, a message is displayed, and the form is redisplayed.
+
+    :arg request: (HttpRequest) Object containing the http request data
+
+    :return: (HttpResponse)
+    - Redirected to the URL specified by next to or to hone if loggin succeeds.
+    - Rendered the template authentification/login.html with the form.
+    """
     # To retrieve the redirect URL; otherwise, it defaults to 'home'
     next_url = request.GET.get('next', 'home')
     if request.method == 'POST':
@@ -71,6 +109,16 @@ def login_page(request):
 
 
 def logout_page(request):
+    """Handle the user logout.
+
+    This view log out the current user, removes existing flash messages to
+    avoid duplicates, display a confirmation message, and then redirects to the
+    login page.
+
+    :arg request: (HttpRequest) Object containing the http request data
+
+    :return: (HttpResponse) Redirected to the login page.
+    """
     logout(request)
     # Clear existing messages
     storage = messages.get_messages(request)

@@ -1,4 +1,16 @@
 asgiref==3.11.1
 Django==6.0.6
+flake8==7.3.0
+flake8-docstrings==1.7.0
+flake8-html==0.4.3
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+mccabe==0.7.0
 pillow==12.2.0
+pycodestyle==2.14.0
+pydocstyle==6.3.0
+pyflakes==3.4.0
+Pygments==2.20.0
+python-dotenv==1.2.2
+snowballstemmer==3.1.1
 sqlparse==0.5.5

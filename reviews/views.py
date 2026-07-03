@@ -1,5 +1,11 @@
-import os
+"""Views for the LITRevu application.
 
+Handles ticket, review, and user follow functionalities, including:
+- Creating, updating, and deleting tickets and reviews.
+- Managing user follow relationships.
+- Displaying personalized feeds and lists.
+"""
+import os
 from django.contrib import messages
 # from django.core.files.storage import default_storage
 # For requests
@@ -8,7 +14,6 @@ from django.db.models import Q
 from authentification.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-
 from litrevu import settings
 from .forms import TicketForm, ReviewForm, TicketWithReviewForm
 from .models import Ticket, Review, UserFollows
@@ -16,6 +21,7 @@ from .models import Ticket, Review, UserFollows
 
 @login_required
 def ticket_list(request):
+    """Display a list of tickets created by the current user."""
     # Only the user's tickets
     tickets = Ticket.objects.filter(user=request.user)
     return render(request, 'reviews/ticket_list.html',
@@ -24,6 +30,14 @@ def ticket_list(request):
 
 @login_required
 def ticket_create(request):
+    """Handle the creation of a new ticket.
+
+    :arg request: (HttpRequest) contains form data and files for ticket
+    creation
+
+    :return redirects to ticket list on success or renders the form with
+    errors.
+    """
     # Verification that the request is of type POST
     if request.method == 'POST':
         # request.POST: Contains all the form's text data (as a dictionary)
@@ -52,32 +66,37 @@ def ticket_create(request):
 
 @login_required
 def ticket_update(request, ticket_id):
+    """Handle the update of a ticket (and image managing).
+
+    :arg:
+    - request: (HttpRequest) contains updated form data and files.
+    - ticket_id: (int) id of the ticket to update.
+
+    :return HttpResponse: redirects to ticket list on success or renders the
+    form with errors.
+    """
     ticket = get_object_or_404(Ticket, pk=ticket_id)
+    # old path
+    old_image_path = None
+    if ticket.image:
+        old_image_path = os.path.join(settings.MEDIA_ROOT, ticket.image.name)
     if request.method == 'POST':
         form = TicketForm(request.POST, request.FILES, instance=ticket)
         if form.is_valid():
             # If a new image is uploaded or if "Clear" is checked
+            print("Ok je suis")
             if 'image' in request.FILES or 'image-clear' in request.POST:
-                if ticket.image:
-                    # Construct the CORRECT path:
-                    # MEDIA_ROOT + 'tickets/' + filename
-                    image_path = os.path.join(settings.MEDIA_ROOT, 'tickets',
-                                              ticket.image.name)
-                    print(f"Chemin du fichier à supprimer : {image_path}")
-                    print(f"Fichier existe ? : {os.path.exists(image_path)}")
+                if old_image_path and os.path.exists(old_image_path):
+                    try:
+                        os.remove(old_image_path)
+                        print(f"old image removed : {old_image_path}")
+                    except Exception as e:
+                        print(f"Error removing : {e}")
+                else:
+                    print(f"Old image not found : {old_image_path}")
 
-                    if os.path.exists(image_path):
-                        try:
-                            os.remove(image_path)
-                            print(f"✅ Fichier supprimé : {image_path}")
-                        except Exception as e:
-                            print(f"❌ Erreur lors de la suppression : {e}")
-                    else:
-                        print(f"❌ Fichier introuvable : {image_path}")
-
-                    # If "Clear" is checked, the field is deleted.
-                    if 'image-clear' in request.POST:
-                        ticket.image = None
+                if 'image-clear' in request.POST:
+                    ticket.image = None
             form.save()
             messages.success(request,
                              "Billet modifié.")
@@ -91,13 +110,80 @@ def ticket_update(request, ticket_id):
                       {'form': form, 'action': 'Modifier',
                        'ticket': ticket})
 
+# @login_required
+# def ticket_update(request, ticket_id):
+#     ticket = get_object_or_404(Ticket, pk=ticket_id)
+#     if request.method == 'POST':
+#         form = TicketForm(request.POST, request.FILES, instance=ticket)
+#         if form.is_valid():
+#             # If a new image is uploaded or if "Clear" is checked
+#             print("Ok je suis")
+#             if 'image' in request.FILES or 'image-clear' in request.POST:
+#                 print("image quelque part")
+#                 if ticket.image:
+#                     print(f"ticket.image : {ticket.image}")
+#                     # Construct the CORRECT path:
+#                     # MEDIA_ROOT + 'tickets/' + filename
+#                     image_path = os.path.join(settings.MEDIA_ROOT, 'tickets',
+#                                               ticket.image.name)
+#                     print(f"Chemin du fichier à supprimer : {image_path}")
+#                     print(f"Fichier existe ? : {os.path.exists(image_path)}")
+#
+#                     if os.path.exists(image_path):
+#                         try:
+#                             os.remove(image_path)
+#                             print(f"✅ Fichier supprimé : {image_path}")
+#                         except Exception as e:
+#                             print(f"❌ Erreur lors de la suppression : {e}")
+#                     else:
+#                         print(f"❌ Fichier introuvable : {image_path}")
+#
+#                     # If "Clear" is checked, the field is deleted.
+#                     if 'image-clear' in request.POST:
+#                         ticket.image = None
+#             form.save()
+#             messages.success(request,
+#                              "Billet modifié.")
+#             return redirect('ticket_list')
+#         else:
+#             messages.error(request,
+#                            "Veuillez corriger les erreurs ci-dessous")
+#     else:
+#         form = TicketForm(instance=ticket)
+#         return render(request, 'reviews/ticket_form.html',
+#                       {'form': form, 'action': 'Modifier',
+#                        'ticket': ticket})
+
 
 @login_required
 def ticket_delete(request, ticket_id):
+    """Handle the deletion of a ticket (and image).
+
+    :arg:
+    - request: (HttpRequest) confirms deletion via POST.
+    - ticket_id: (int) id of the ticket to delete.
+
+    :return HttpResponse: redirects to ticket list on success or renders
+    confirmation page.
+    """
     # To retrieve a ticket or return a 404 error if it does not exist.
     ticket = get_object_or_404(Ticket, pk=ticket_id, user=request.user)
+    old_image_path = None
+    if ticket.image:
+        old_image_path = os.path.join(settings.MEDIA_ROOT, ticket.image.name)
     if request.method == 'POST':
+        # delete image too in the media/tickets/
+        if old_image_path and os.path.exists(old_image_path):
+            try:
+                os.remove(old_image_path)
+                print(f"old image removed : {old_image_path}")
+            except Exception as e:
+                print(f"Error removing : {e}")
+        else:
+            print(f"Old image not found : {old_image_path}")
+
         ticket.delete()
+
         messages.success(request, "Billet supprimé.")
         return redirect('ticket_list')
     return render(request, 'reviews/ticket_delete.html',
@@ -107,6 +193,7 @@ def ticket_delete(request, ticket_id):
 # ----- Reviews-------------
 @login_required
 def review_list(request):
+    """Display a list of reviews created by the current user."""
     reviews = Review.objects.filter(user=request.user)
     return render(request, 'reviews/review_list.html',
                   {'reviews': reviews})
@@ -114,6 +201,13 @@ def review_list(request):
 
 @login_required
 def review_create(request):
+    """Handle the creation of a new review.
+
+    :arg request : (HttpRequest) contains form data for review creation.
+
+    :return HttpResponse: Redirects to review list on success or renders the
+    form with errors.
+    """
     if request.method == 'POST':
         form = ReviewForm(request.POST, request.FILES,
                           user=request.user)
@@ -135,6 +229,15 @@ def review_create(request):
 
 @login_required
 def review_update(request, review_id):
+    """Handle the update of an existing review.
+
+    :arg:
+    - request : (HttpRequest) contains updated form data.
+    - review_id : (int) id of the review to update.
+
+    :return HttpResponse: Redirects to review list on success or renders the
+    form with errors.
+    """
     review = get_object_or_404(Review, id=review_id, user=request.user)
     if request.method == 'POST':
         form = ReviewForm(request.POST, request.FILES, instance=review,
@@ -154,6 +257,15 @@ def review_update(request, review_id):
 
 @login_required
 def review_delete(request, review_id):
+    """Handle the deletion of a review.
+
+    :arg:
+    - request: (HttpRequest) confirms deletion via POST.
+    - review_id : (int) id of the review to delete.
+
+    :return HttpResponse: redirects to review list on success or renders
+    confirmation page.
+    """
     review = get_object_or_404(Review, id=review_id, user=request.user)
     if request.method == 'POST':
         review.delete()
@@ -167,6 +279,7 @@ def review_delete(request, review_id):
 # View for the list of all users, excluding oneself
 @login_required
 def user_list(request):
+    """Display a list of all users, excluding the current user."""
     users = User.objects.exclude(id=request.user.id)
     return render(request, 'reviews/user_list.html',
                   {'users': users})
@@ -175,6 +288,14 @@ def user_list(request):
 # View to follow a user
 @login_required
 def follow_user(request, user_id):
+    """Handle following a user.
+
+    :arg
+    - request: (HttpRequest) initiates the follow action.
+    - user_id: (int) id of the user to follow.
+
+    :return HttpResponse: redirects to user list with success/error message.
+    """
     user_to_follow = get_object_or_404(User, id=user_id)
 
     if user_to_follow == request.user:
@@ -199,6 +320,15 @@ def follow_user(request, user_id):
 # View for unsubscribing from a user
 @login_required
 def unfollow_user(request, user_id):
+    """Handle unfollowing a user.
+
+    :arg:
+        request: (HttpRequest) initiates the unfollow action.
+        user_id: (int) id of the user to unfollow.
+
+    :return HttpResponse: redirects to followed users list with success/error
+    message.
+    """
     user_to_unfollow = get_object_or_404(User, id=user_id)
 
     # Verification: Does the tracking exist?
@@ -219,6 +349,7 @@ def unfollow_user(request, user_id):
 
 @login_required
 def followed_users_list(request):
+    """Display a list of users followed by the current user."""
     followed_users = request.user.following.all()
     return render(request, 'reviews/followed_users_list.html',
                   {'followed_users': followed_users})
@@ -227,6 +358,14 @@ def followed_users_list(request):
 # personnalisation feed
 @login_required
 def feed(request):
+    """Display a personalized feed of tickets and reviews.
+
+    Combines tickets and reviews from the current user and users they follow,
+    sorted by creation date (newest first).
+
+    :return HttpResponse: renders the feed template with combined and sorted
+    content.
+    """
     # We will gather all the necessary data.
     current_user = request.user  # connected user
 
@@ -273,6 +412,15 @@ def feed(request):
 
 @login_required
 def ticket_reviews(request, ticket_id):
+    """Display all reviews for a specific ticket.
+
+    :arg:
+        request : (HttpRequest) request to view ticket reviews.
+        ticket_id : (int) id of the ticket to fetch reviews for.
+
+    :return HttpResponse: renders the ticket reviews template with ticket and
+    reviews.
+    """
     ticket = get_object_or_404(Ticket, id=ticket_id)
     reviews = Review.objects.filter(ticket=ticket).order_by('-time_created')
     return render(request, 'reviews/ticket_reviews.html',
@@ -281,6 +429,13 @@ def ticket_reviews(request, ticket_id):
 
 @login_required
 def create_ticket_with_review(request):
+    """Handle the creation of a ticket and its associated review in one step.
+
+    :arg request : (HttpRequest) contains form data for both ticket and review.
+
+    :return HttpResponse: redirects to feed on success, or renders the form
+    with errors.
+    """
     if request.method == 'POST':
         form = TicketWithReviewForm(request.POST, request.FILES,
                                     user=request.user)

@@ -9,36 +9,48 @@
 </head>
 <body>
 <div class="container">
+    <header role="banner">
     <div class="header">
-        <div class="header_title">Page d'accueil</div>
-
+        <!--<div class="header_title">Page d'accueil</div>-->
+        <h1 class="header_title">Page de connexion</h1>
     </div>
+    </header>
+    <main role="main">
     <div class="logo-container">
         <div class="logo">LITReview</div>
     </div>
     <div class="content">
         <div class="left-section">
-            <div class="sign-up-title">Inscrivez-vous maintenant</div>
+            <section id="signup-heading" aria-labelledby="signup-heading">
+            <!--<div class="sign-up-title">Inscrivez-vous maintenant</div>-->
+            <h2 class="sign-up-title">Inscrivez-vous maintenant</h2>
             <a href="{% url 'signup' %}" class="sign-up-btn">S'inscrire</a>
+                </section>
         </div>
         <div class="right-section">
-            <div class="login-title">Connectez-vous</div>
+            <section id="login-heading" aria-labelledby="login-heading">
+            <!--<div class="login-title">Connectez-vous</div>-->
+            <h2 class="login-title">Connectez-vous</h2>
             {% if messages %}
-            <div class="messages">
+            <div class="messages" role="alert" aria-live="assertive">
                 {% for message in messages %}
-                <p>{{ message }}</p>
+                <p style="color: rgba(97,0,0,1);">{{ message }}</p>
                 {% endfor %}
             </div>
             {% endif %}
-            <form method="post" class="login-form">
+            <form method="post" class="login-form" aria-labelledby="login-heading">
                 {% csrf_token %}
-                <input type="text" name="username" class="input-field" placeholder="Nom d'utilisateur" required>
-                <input type="password" name="password" class="input-field" placeholder="Mot de passe" required>
+                <label for="id_username">Nom d'utilisateur</label>
+                <input type="text" id="id_username" name="username" class="input-field" placeholder="Nom d'utilisateur" required aria-required="true">
+                <label for="id_password">Mot de passe</label>
+                <input type="password" id="id_password" name="password" class="input-field" placeholder="Mot de passe" required aria-required="true">
                 <input type="hidden" name="next" value="{{ next }}"> <!-- marche sans mais mis quand même -->
                 <button type="submit" class="login-btn">Se connecter</button>
             </form>
+            </section>
         </div>
     </div>
+    </main>
 </div>
 </body>
 </html>

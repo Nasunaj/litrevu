@@ -12,12 +12,15 @@
 <div class="container">
     <div class="header">
         <div class="header-nav">
+            <nav id="id-header-nav" aria-label="Navigation principale">
             <a href="{% url 'home' %}" class="nav-link">Accueil</a>
             <a href="{% url 'feed' %}" class="nav-link">Mon flux</a>
             <a href="{% url 'ticket_list' %}" class="nav-link">Mes billets</a>
             <a href="{% url 'review_list' %}" class="nav-link">Mes critiques</a>
             <a href="{% url 'user_list' %}" class="nav-link">Utilisateurs</a>
+            </nav>
         </div>
+
         <!-- Nom de l'utilisateur (à droite) -->
         <div class="header-user">
             {% if user.is_authenticated %}
@@ -29,12 +32,20 @@
             {% endif %}
         </div>
     </div>
+    <main id="id-main-container" role="main">
     <div class="logo-container">
         <div class="logo">LITReview</div>
+        <header role="banner">
+            <div class="header_in_main">
+                <!--<div class="header_title">Page d'accueil</div>-->
+                <h1 class="header_in_main_title">{% block h1_title %}{% endblock %}</h1>
+            </div>
+        </header>
     </div>
 
     <!-- Contenu spécifique à chaque page -->
     {% block content %}{% endblock %}
+    </main>
 </div>
 </body>
 </html>
