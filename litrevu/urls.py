@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-# from django.views.generic import RedirectView
+from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 import authentification.views
@@ -53,6 +53,8 @@ urlpatterns = [
          name='unfollow_user'),
     path('users/followed/', reviews.views.followed_users_list,
          name='followed_users_list'),
+    path('users/followers/', reviews.views.followers_list,
+         name='followers_list'),
 
     # flux
     path('feed/', reviews.views.feed, name='feed'),
@@ -62,8 +64,16 @@ urlpatterns = [
     path('tickets/add-with-review/',
          reviews.views.create_ticket_with_review,
          name='ticket_and_with_review'),
+
+    path('users/block/<int:user_id>/', reviews.views.block_user,
+         name='block_user'),
+    path('users/unblock/<int:user_id>/', reviews.views.unblock_user,
+         name='unblock_user'),
+    path('users/blocked/', reviews.views.blocked_users_list,
+         name='blocked_users_list'),
+
     # Redirected to /login instead of landing on http://127.0.0.1:8000/
-    # path('', RedirectView.as_view(url='login/')),
+    path('', RedirectView.as_view(url='login/')),
 ]
 
 # configuration for serving developing media (image)

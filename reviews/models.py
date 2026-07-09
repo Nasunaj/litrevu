@@ -92,7 +92,7 @@ class UserFollows(models.Model):
 
 
 class Review(models.Model):
-    """Model representing a review of a ticket in the pplication.
+    """Model representing a review of a ticket in the application.
 
     A review is linked to a ticket and includes a rating, headline, and body.
     It is created by a user and associated with a specific ticket.
@@ -134,3 +134,33 @@ class Review(models.Model):
         """
         return (f"Critique de {self.user.username} pour {self.ticket.title} : "
                 f"{self.rating}")
+
+
+class BlockedUser(models.Model):
+    """Model representing a user that has been blocked."""
+
+    # Blocking user
+    user = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blocked_by'
+    )
+
+    # Blocked user
+    blocked_user = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blocked_users'
+    )
+
+    # Lock-out date
+    time_bloqued = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Meta options for the BlockedUser model."""
+
+        unique_together = ('user', 'blocked_user')
+
+    def __str__(self):
+        """Return a readable representation of the user."""
+        return f"{self.user.username} a bloqué {self.blocked_user.username}"

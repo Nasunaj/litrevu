@@ -1,0 +1,30 @@
+{% extends 'authentification/base.html' %}
+
+{% block title %}Utilisateurs bloqués - LITReview{% endblock %}
+{% block h1_title %}Utilisateurs bloqués{% endblock %}
+{% block content %}
+        <div class="content">
+            <div class="right-section">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p class="message {{ message.tags }}">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <h2>Liste des utilisateurs bloqués</h2>
+                {% if blocked_users %}
+                    <ul>
+                        {% for user in blocked_users %}
+                            <li>
+                                <p><strong>{{ user.username }}</strong></p>
+                                <a href="{% url 'unblock_user' user.id %}" class="sign-up-btn">Débloquer</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Vous n'avez bloqué aucun utilisateur.</p>
+                {% endif %}
+            </div>
+        </div>
+{% endblock %}

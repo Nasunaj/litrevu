@@ -14,9 +14,10 @@ from django.db.models import Q
 from authentification.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from litrevu import settings
 from .forms import TicketForm, ReviewForm, TicketWithReviewForm
-from .models import Ticket, Review, UserFollows
+from .models import Ticket, Review, UserFollows, BlockedUser
 
 
 @login_required
@@ -277,12 +278,46 @@ def review_delete(request, review_id):
 
 # ----------- Follow -------------
 # View for the list of all users, excluding oneself
+# @login_required
+# def user_list(request):
+#     """Display a list of all users, excluding the current user."""
+#     users = User.objects.exclude(id=request.user.id)
+#     return render(request, 'reviews/user_list.html',
+#                   {'users': users})
 @login_required
 def user_list(request):
-    """Display a list of all users, excluding the current user."""
+    """Display a list of users.
+
+    :arg request: (HttpRequest) The HTTP request object.
+
+    :return HttpResponse: Rendered template 'reviews/user_list.html
+    """
+    # Retrieves the requested username from the GET request.
+    search_name_user = request.GET.get('search', '').strip()
+
+    # Exclude the logged-in user from the list
     users = User.objects.exclude(id=request.user.id)
-    return render(request, 'reviews/user_list.html',
-                  {'users': users})
+
+    if search_name_user:
+        # Filter users whose username contains the search
+        # term(case-insensitive)
+        users = users.filter(username__icontains=search_name_user)
+
+        # if no user matches
+        if not users.exists():
+            messages.error(request, f"Aucun utilisateur trouvé avec "
+                                    f"le nom {search_name_user}.")
+    # Pagination : 5 users by page
+    paginator = Paginator(users, 5)  # Display 5 users by page
+    # Retrieves the page number from the URL
+    page_number = request.GET.get('page')
+    # Retrieve the users for this page
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'reviews/user_list.html', {
+        'users': users,
+        'search_name_user': search_name_user,
+        'page_obj': page_obj,
+    })
 
 
 # View to follow a user
@@ -337,13 +372,15 @@ def unfollow_user(request, user_id):
                             followed_user=user_to_unfollow).first())
     if not follow_relationship:
         messages.error(request,
-                       f"Vous ne suivez pas {user_to_unfollow.username}.")
+                       f"Vous ne suivez pas "
+                       f"{user_to_unfollow.username}.")
         return redirect('followed_users_list')
 
     # Delete the follow
     follow_relationship.delete()
     messages.success(request,
-                     f"Vous ne suivez pas {user_to_unfollow.username}.")
+                     f"Vous ne suivez pas "
+                     f"{user_to_unfollow.username}.")
     return redirect('followed_users_list')
 
 
@@ -448,3 +485,84 @@ def create_ticket_with_review(request):
         form = TicketWithReviewForm(user=request.user)
     return render(request, 'reviews/ticket_with_review_form.html',
                   {'form': form})
+
+
+@login_required
+def block_user(request, user_id):
+    """Block a user."""
+    user_to_block = get_object_or_404(User, id=user_id)
+
+    # Verify that the user doesn't lock themselves out.
+    if user_to_block == request.user:
+        messages.error(request,
+                       "Vous ne pouvez pas vous bloquer vous-même.")
+        return redirect('user_list')
+
+        # Verify if user is already blocked
+    if BlockedUser.objects.filter(user=request.user,
+                                  blocked_user=user_to_block).exists():
+        messages.error(request,
+                       f"Vous avez déjà bloqué "
+                       f"{user_to_block.username}.")
+        return redirect('user_list')
+
+    # Create then block
+    BlockedUser.objects.create(user=request.user, blocked_user=user_to_block)
+
+    # Automatically unfollow if the user was followed
+    follow_relationship = UserFollows.objects.filter(
+        user=request.user, followed_user=user_to_block).first()
+    if follow_relationship:
+        follow_relationship.delete()
+        messages.info(request, f"Vous avez été désabonné de "
+                               f"{user_to_block.username}.")
+
+    messages.success(request,
+                     f"Vous avez bloqué {user_to_block.username}.")
+    return redirect('user_list')
+
+
+@login_required
+def unblock_user(request, user_id):
+    """Unblock a user."""
+    user_to_unblock = get_object_or_404(User, id=user_id)
+
+    # Verify that the block exists
+    block_relationship = BlockedUser.objects.filter(
+        user=request.user, blocked_user=user_to_unblock).first()
+    if not block_relationship:
+        messages.error(request,
+                       f"Vous n'avez pas bloqué {user_to_unblock.username}.")
+        return redirect('blocked_users_list')
+
+    # Unblock user
+    block_relationship.delete()
+    messages.success(request,
+                     f"Vous avez débloqué {user_to_unblock.username}.")
+    return redirect('blocked_users_list')
+
+
+@login_required
+def blocked_users_list(request):
+    """List all blocked users."""
+    # Retrieves blocked users directly (not BlockedUser objects)
+    blocked_users = BlockedUser.objects.filter(
+        user=request.user
+        # Returns a list of user IDs
+    ).values_list('blocked_user', flat=True)
+
+    # Converts IDs into User objects.
+    blocked_users = User.objects.filter(id__in=blocked_users)
+
+    return render(request, 'reviews/blocked_users_list.html',
+                  {'blocked_users': blocked_users})
+
+
+@login_required
+def followers_list(request):
+    """Display a list of users who follow the current user."""
+    # Retrieves the users who follow the logged-in user
+    # Thanks to related_name='followed_by' in UserFollows
+    followers = request.user.followed_by.all()
+    return render(request, 'reviews/followers_list.html',
+                  {'followers': followers})

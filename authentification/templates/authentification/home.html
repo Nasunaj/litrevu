@@ -2,10 +2,9 @@
 
 {% block title %}Accueil - LITReview{% endblock %}
 {% block h1_title %}Accueil{% endblock %}
-
 {% block content %}
-    <div class="content">
-        <div class="right-session">
+<div class="content">
+            <div class="right-session">
             <h2>Tableau de bords</h2>
 
             <!-- Stats -->
@@ -25,8 +24,17 @@
                     <p>{{ followed_users_count }}</p>
                     <a href="{% url 'followed_users_list' %}">Voir mes abonnements</a>
                 </div>
+                <div class="stat-box">
+                    <h3>Mes abonnés</h3>
+                    <p>{{ followers_count }}</p>
+                    <a href="{% url 'followers_list' %}">Voir mes abonnés</a>
+                </div>
+                <div class="stat-box">
+                    <h3>Utilisateurs bloqués</h3>
+                    <p>{{ blocked_users_count }}</p>
+                    <a href="{% url 'blocked_users_list' %}">Voir les bloqués</a>
+                </div>
             </div>
-
             <!-- Autres liens -->
             <div class="quick-links">
                 <h3>Liens rapides</h3>
@@ -34,6 +42,5 @@
                 <a href="{% url 'user_list' %}" class="sign-up-btn">Trouver des utilisateurs</a>
             </div>
         </div>
-
-    </div>
+</div>
 {% endblock %}

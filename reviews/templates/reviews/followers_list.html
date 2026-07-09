@@ -1,0 +1,31 @@
+{% extends 'authentification/base.html' %}
+
+{% block title %}Mes abonnés - LITReview{% endblock %}
+{% block h1_title %}Mes abonnées{% endblock %}
+{% block content %}
+        <div class="content">
+            <div class="right-section">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <p class="message {{ message.tags }}">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <h2>Liste des utilisateurs qui me suivent</h2>
+                {% if followers %}
+                    <ul>
+                        {% for user in followers %}
+                            <li>
+                                <p><strong>{{ user.user.username }}</strong></p>
+                                <!-- Optionnel : Ajouter un bouton pour bloquer un follower -->
+                                <a href="{% url 'block_user' user.id %}" class="sign-up-btn">Bloquer</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Personne ne vous suit encore.</p>
+                {% endif %}
+            </div>
+        </div>
+{% endblock %}

@@ -6,6 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from reviews.models import Ticket, Review, UserFollows
+from .forms import CustomUserCreationForm
 
 
 # @login_required(login_url='login') not necessary because we defined
@@ -29,40 +30,59 @@ def home(request):
     reviews_count = Review.objects.filter(user=user).count()
     # Nb users followed
     followed_users_count = UserFollows.objects.filter(user=user).count()
+    # Nb of users following the current use
+    followers_count = user.followed_by.count()
+    # Nb of users blocked
+    blocked_users_count = user.blocked_users.count()
     return render(request, 'authentification/home.html', {
         'tickets_count': tickets_count,
         'reviews_count': reviews_count,
         'followed_users_count': followed_users_count,
+        'followers_count': followers_count,
+        'blocked_users_count': blocked_users_count,
     }
                   )
 
 
+# def signup(request):
+#     """Handle the registration of a new user.
+#
+#     This view processes POST requests to create a user account. If the form is
+#     valid, the user is created, automatically logged-in and redirected to the
+#     home page. If else error, message is displayed.
+#
+#     :arg request: (HttpRequest) Object containing the http request data
+#     :return: (HttpResponse)
+#     - Redirected to the home page if registration is succeeds.
+#     - Rendered HTML page using the template.
+#     """
+#     if request.method == 'POST':
+#         form = UserCreationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)
+#             messages.success(request, 'Inscription réussie !')
+#             return redirect('home')
+#         else:
+#             messages.error(request, "Erreur lors de l'inscription.")
+#     else:
+#         form = UserCreationForm()
+#         return render(request, 'authentification/signup.html',
+#                       {'form': form})
 def signup(request):
-    """Handle the registration of a new user.
-
-    This view processes POST requests to create a user account. If the form is
-    valid, the user is created, automatically logged-in and redirected to the
-    home page. If else error, message is displayed.
-
-    :arg request: (HttpRequest) Object containing the http request data
-    :return: (HttpResponse)
-    - Redirected to the home page if registration is succeeds.
-    - Rendered HTML page using the template.
-    """
+    """Handle the registration of a new user."""
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)  # Utilise le formulaire personnalisé
         if form.is_valid():
             user = form.save()
             login(request, user)
             messages.success(request, 'Inscription réussie !')
             return redirect('home')
-        else:
-            messages.error(request, "Erreur lors de l'inscription.")
+        # else:
+        #     messages.error(request, "Erreur lors de l'inscription.")
     else:
-        form = UserCreationForm()
-        return render(request, 'authentification/signup.html',
-                      {'form': form})
-
+        form = CustomUserCreationForm()  # Formulaire vide pour GET
+    return render(request, 'authentification/signup.html', {'form': form})
 
 def login_page(request):
     """Handle the login of a user.

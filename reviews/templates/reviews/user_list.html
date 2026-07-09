@@ -3,34 +3,101 @@
 {% block title %}Utilisateurs à suivre - LITReview{% endblock %}
 {% block h1_title %}Utilisateurs à suivre{% endblock %}
 {% block content %}
+        <a href="{% url 'followed_users_list' %}" class="sign-up-btn">Voir mes abonnements</a>
+        <a href="{% url 'followers_list' %}" class="sign-up-btn">Voir mes abonnés</a>
+        <a href="{% url 'blocked_users_list' %}" class="sign-up-btn">Voir ma liste des utilisateurs bloqués</a>
         <div class="content">
-            <div class="right-session">
-                <a href="{% url 'followed_users_list' %}" class="sign-up-btn">
-                    Voir mes abonnements
-                </a>
+            <div class="right-section">
+                <!-- Champ de recherche -->
+                <form method="get" action="{% url 'user_list' %}" class="search-form">
+                    <label for="search">Rechercher un utilisateur :</label>
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        value="{{ search_name_user }}"
+                        placeholder="Entrez un nom d'utilisateur..."
+                        required
+                    >
+                    <button type="submit" class="login-btn">Rechercher</button>
+                </form>
+
+                <!-- Messages (erreurs ou succès) -->
                 {% if messages %}
                     <div class="messages">
                         {% for message in messages %}
-                        <p style="color: rgba(97,0,0,1);">{{ message }}</p>
+                            <p class="message {{ message.tags }}">{{ message }}</p>
                         {% endfor %}
                     </div>
                 {% endif %}
-                <h2>Liste des utilisateurs </h2>
+
+                <!--<h2>Liste des utilisateurs</h2>
                 {% if users %}
                     <ul>
                         {% for user in users %}
                             <li>
-                                <p>
-                                    {{ user.username }}
-                                    <a href="{% url 'follow_user' user.id %}" class="sign-up-btn">Suivre</a>
-                                </p>
-                                <br><br>
+                                <p>{{ user.username }}</p>
+                                <a href="{% url 'follow_user' user.id %}" class="sign-up-btn">Suivre</a>
+                                <a href="{% url 'block_user' user.id %}" class="sign-up-btn">Bloquer</a>
                             </li>
                         {% endfor %}
                     </ul>
                 {% else %}
-                <p>Il n'y a aucun n'autre utilisateur</p>
-                {% endif %}
+                    {% if search_query %}
+                        <p>Aucun utilisateur trouvé. Essayez un autre nom.</p>
+                    {% else %}
+                        <p>Il n'y a aucun autre utilisateur.</p>
+                    {% endif %}
+                {% endif %}-->
+                <div class="table-container">
+                <h2>Liste des utilisateurs</h2>
+                {% if page_obj %}
+                <!-- Tableau pour afficher les utilisateurs -->
+                <table class="user-table">
+                    <thead>
+                    <tr>
+                        <th>N°</th>
+                        <th>Nom d'utilisateur</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in page_obj %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>  <!-- Numéro automatique -->
+                        <td>{{ user.username }}</td>
+                        <td>
+                            <a href="{% url 'follow_user' user.id %}" class="sign-up-btn">Suivre</a>
+                            <a href="{% url 'block_user' user.id %}" class="sign-up-btn">Bloquer</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if page_obj.has_previous %}
+                            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">&laquo; Première</a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Précédente</a>
+                            {% endif %}
+                            <span class="current">
+                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </span>
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Suivante</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Dernière &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% else %}
+                    {% if search_query %}
+                    <p>Aucun utilisateur trouvé. Essayez un autre nom.</p>
+                    {% else %}
+                    <p>Il n'y a aucun autre utilisateur.</p>
+                    {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
 {% endblock %}
