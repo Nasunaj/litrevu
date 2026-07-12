@@ -3,14 +3,10 @@
 {% block title %}Mes billets - LITReview{% endblock %}
 {% block h1_title %}Mes billets{% endblock %}
 {% block content %}
+    <a href="{% url 'ticket_create' %}" class="sign-up-btn">Ajouter un billet</a>
+    <a href="{% url 'ticket_and_with_review' %}" class="sign-up-btn">Ajouter un billet accompagné d'une critique</a>
         <div class="content">
             <div class="right-session">
-                <a href="{% url 'ticket_create' %}" class="sign-up-btn">
-                    Ajouter un billet
-                </a>
-                <a href="{% url 'ticket_and_with_review' %}" class="sign-up-btn">
-                    Ajouter un billet accompagné d'une critique
-                </a>
                 {% if messages %}
                     <div class="messages">
                         {% for message in messages %}
@@ -20,19 +16,37 @@
                 {% endif %}
                 <h2>Liste des billets</h2>
                 {% if tickets %}
-                    <ul>
                         {% for ticket in tickets %}
-                            <li>
+                            <div class="ticket">
                                 <h3>{{ ticket.title }}</h3>
                                 <p>{{ ticket.description }}</p>
+                                {% if ticket.image %}
+                                    <img src="{{ ticket.image.url }}" alt="image du billet : {{ ticket.title }}" width="100">
+                                {% endif %}
                                 <p>Créé le : {{ticket.time_created}}</p>
                                 <a href="{% url 'ticket_reviews' ticket_id=ticket.id %}" class="sign-up-btn">Voir les critiques</a>
                                 <a href="{% url 'ticket_update' ticket.id %}" class="sign-up-btn">Modifier</a>
                                 <a href="{% url 'ticket_delete' ticket.id %}" class="sign-up-btn">Supprimer</a>
-                                <br><br>
-                            </li>
+                            </div>
                         {% endfor %}
-                    </ul>
+                        <!-- Pagination pour les billets -->
+                        <div class="pagination">
+                            <span class="step-links">
+                            {% if tickets.has_previous %}
+                                <a href="?ticket_page=1">« Première</a>
+                                <a href="?ticket_page={{ tickets.previous_page_number }}">Précédente</a>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ tickets.number }} sur {{ tickets.paginator.num_pages }}
+                            </span>
+
+                            {% if tickets.has_next %}
+                                <a href="?ticket_page={{ tickets.next_page_number }}">Suivante</a>
+                                <a href="?ticket_page={{ tickets.paginator.num_pages }}">Dernière »</a>
+                            {% endif %}
+                            </span>
+                        </div>
                 {% else %}
                 <p>Vous n'avez aucun billet</p>
                 {% endif %}

@@ -77,18 +77,6 @@ python manage.py migrate
 
 ---
 
-### 6. Create a Superuser (Admin)
-
-To access Django's admin interface, create a superuser:
-
-```bash
-python manage.py createsuperuser
-```
-
-Follow the instructions to set a username, email address, and password.
-
----
-
 ### 7. Run the Development Server
 
 Start the Django server with the following command:

@@ -17,9 +17,10 @@
                     <ul>
                         {% for user in followers %}
                             <li>
-                                <p><strong>{{ user.user.username }}</strong></p>
+                                <p>{{ user.user.username }}
                                 <!-- Optionnel : Ajouter un bouton pour bloquer un follower -->
                                 <a href="{% url 'block_user' user.id %}" class="sign-up-btn">Bloquer</a>
+                                </p>
                             </li>
                         {% endfor %}
                     </ul>

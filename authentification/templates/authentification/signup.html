@@ -10,24 +10,15 @@
 <body>
 <!-- Header commun à toutes les pages -->
 <div class="container">
-    <div class="header">
-        <div class="header-nav">
+    <header role="banner">
+        <div class="header">
+            <h1 class="header_title" id="signup-heading">Inscription</h1>
         </div>
-
-        <!-- Nom de l'utilisateur (à droite) -->
-        <div class="header-user">
+    </header>
+    <main class="main-container" role="main">
+        <div class="logo-container">
+            <img src="{% static 'images/noname_13-a-book-2160539_1920_v1.png' %}" alt="Logo LITRevu" class="logo-img">
         </div>
-    </div>
-    <main id="id-main-container" role="main">
-    <div class="logo-container">
-        <div class="logo">LITReview</div>
-        <header role="banner">
-            <div class="header_in_main">
-                <!--<div class="header_title">Page d'accueil</div>-->
-                <h1 class="header_in_main_title" id="signup-heading">Inscription</h1>
-            </div>
-        </header>
-    </div>
 <!--    <h1>Inscription</h1>-->
 <!--    {% if message in messages %}-->
 <!--        {% for message in messages %}-->
@@ -80,6 +71,7 @@
 <!--    </p>-->
 
         <!-- Messages globaux (succès/erreur) -->
+        <div class="div-inscription">
         {% if messages %}
             <div class="messages" role="alert" aria-live="polite">
                 {% for message in messages %}
@@ -145,7 +137,6 @@
                 </div>
                 {% endif %}
             </div>
-            <br>
             <!-- Bouton de soumission -->
             <button type="submit" class="sign-up-btn">S'inscrire</button>
         </form>
@@ -154,6 +145,7 @@
         <p class="login-link">
             Déjà un compte ? <a href="{% url 'login' %}">Se connecter</a>
         </p>
+        </div>
     </main>
 </div>
 </body>

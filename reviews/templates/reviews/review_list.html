@@ -3,11 +3,9 @@
 {% block title %}Mes critiques - LITReview{% endblock %}
 {% block h1_title %}Mes critiques{% endblock %}
 {% block content %}
+<a href="{% url 'review_create' %}" class="sign-up-btn">Ajouter une critique</a>
         <div class="content">
             <div class="right-session">
-                <a href="{% url 'review_create' %}" class="sign-up-btn">
-                    Ajouter une critique
-                </a>
                 {% if messages %}
                     <div class="messages">
                         {% for message in messages %}
@@ -17,20 +15,39 @@
                 {% endif %}
                 <h2>Liste de mes critiques</h2>
                 {% if reviews %}
-                    <ul>
                         {% for review in reviews %}
-                            <li>
-                                <h3>{{ review.headline }}</h3>
-                                <p>Note : {{ review.rating }}/5</p>
-                                <p>Pour le billet : <a href="{% url 'ticket_reviews' ticket_id=review.ticket.id %}">{{review.ticket.title}}</a></p>
-                                <p>{{ review.body }}</p>
-                                <p>Créé le : {{ review.time_created }}</p>
-                                <a href="{% url 'review_update' review.id %}" class="sign-up-btn">Modifier</a>
-                                <a href="{% url 'review_delete' review.id %}" class="sign-up-btn">Supprimer</a>
-                                <br><br>
-                            </li>
+                            <div class="review">
+                                <h3>{{review.ticket.title}}</h3>
+                                <p class="p-rating-date-author">
+                                    <span class="p-rating">{{ review.rating }}/5</span>
+                                    <span class="date-author">{{ review.time_created }}</span>
+                                </p>
+                                <h4>{{ review.headline }}</h4>
+                                <p class="p-description">{{ review.body }}</p>
+                                <p>
+                                    <a href="{% url 'review_update' review.id %}" class="sign-up-btn">Modifier</a>
+                                    <a href="{% url 'review_delete' review.id %}" class="sign-up-btn">Supprimer</a>
+                                </p>
+                                </div>
                         {% endfor %}
-                    </ul>
+                                <!-- Pagination pour les billets -->
+                        <div class="pagination">
+                            <span class="step-links">
+                            {% if reviews.has_previous %}
+                                <a href="?review_page=1">« Première</a>
+                                <a href="?review_page={{ reviews.previous_page_number }}">Précédente</a>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ reviews.number }} sur {{ reviews.paginator.num_pages }}
+                            </span>
+
+                            {% if reviews.has_next %}
+                                <a href="?review_page={{ reviews.next_page_number }}">Suivante</a>
+                                <a href="?review_page={{ reviews.paginator.num_pages }}">Dernière »</a>
+                            {% endif %}
+                            </span>
+                        </div>
                 {% else %}
                 <p>Vous n'avez aucune critiques</p>
                 {% endif %}

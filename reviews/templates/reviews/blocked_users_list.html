@@ -17,8 +17,9 @@
                     <ul>
                         {% for user in blocked_users %}
                             <li>
-                                <p><strong>{{ user.username }}</strong></p>
+                                <p>{{ user.username }}
                                 <a href="{% url 'unblock_user' user.id %}" class="sign-up-btn">Débloquer</a>
+                                </p>
                             </li>
                         {% endfor %}
                     </ul>

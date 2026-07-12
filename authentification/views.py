@@ -2,7 +2,7 @@
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from reviews.models import Ticket, Review, UserFollows
@@ -47,9 +47,9 @@ def home(request):
 # def signup(request):
 #     """Handle the registration of a new user.
 #
-#     This view processes POST requests to create a user account. If the form is
-#     valid, the user is created, automatically logged-in and redirected to the
-#     home page. If else error, message is displayed.
+#     This view processes POST requests to create a user account. If the form
+#     is valid, the user is created, automatically logged-in and redirected to
+#     the home page. If else error, message is displayed.
 #
 #     :arg request: (HttpRequest) Object containing the http request data
 #     :return: (HttpResponse)
@@ -72,7 +72,8 @@ def home(request):
 def signup(request):
     """Handle the registration of a new user."""
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)  # Utilise le formulaire personnalisé
+        # Use personnalized form
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
@@ -82,7 +83,9 @@ def signup(request):
         #     messages.error(request, "Erreur lors de l'inscription.")
     else:
         form = CustomUserCreationForm()  # Formulaire vide pour GET
-    return render(request, 'authentification/signup.html', {'form': form})
+    return render(request, 'authentification/signup.html',
+                  {'form': form})
+
 
 def login_page(request):
     """Handle the login of a user.

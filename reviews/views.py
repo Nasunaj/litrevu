@@ -24,9 +24,17 @@ from .models import Ticket, Review, UserFollows, BlockedUser
 def ticket_list(request):
     """Display a list of tickets created by the current user."""
     # Only the user's tickets
-    tickets = Ticket.objects.filter(user=request.user)
+    tickets = Ticket.objects.filter(user=request.user).order_by(
+        '-time_created')
+    # Pagination ticket
+    ticket_paginator = Paginator(tickets, 5)
+    ticket_page_number = request.GET.get('ticket_page')
+    ticket_page_obj = ticket_paginator.get_page(ticket_page_number)
     return render(request, 'reviews/ticket_list.html',
-                  {'tickets': tickets})
+                  {
+                      # 'tickets': tickets,
+                      'tickets': ticket_page_obj,
+                  })
 
 
 @login_required
@@ -195,9 +203,17 @@ def ticket_delete(request, ticket_id):
 @login_required
 def review_list(request):
     """Display a list of reviews created by the current user."""
-    reviews = Review.objects.filter(user=request.user)
+    reviews = Review.objects.filter(user=request.user).order_by(
+        '-time_created')
+    # Pagination review
+    review_paginator = Paginator(reviews, 5)
+    review_page_number = request.GET.get('review_page')
+    review_page_obj = review_paginator.get_page(review_page_number)
     return render(request, 'reviews/review_list.html',
-                  {'reviews': reviews})
+                  {
+                      # 'reviews': reviews,
+                      'reviews': review_page_obj,
+                  })
 
 
 @login_required
@@ -213,7 +229,7 @@ def review_create(request):
         form = ReviewForm(request.POST, request.FILES,
                           user=request.user)
         if form.is_valid():
-            # The user is missing,
+            # The user is missing
             # so first we prepare the database without saving.
             review = form.save(commit=False)
             review.user = request.user  # we add user
@@ -420,31 +436,46 @@ def feed(request):
     reviews = Review.objects.filter(
         Q(user=current_user) | Q(user__in=followed_users) |
         Q(ticket__user=current_user)
-    )
+    ).order_by('-time_created')
 
-    # Merge into a single list
-    combined = []
-    for ticket in tickets:
-        me = 1 if ticket.user == current_user else 0
-        combined.append({
-            'type': 'ticket',
-            'object': ticket,
-            'time_created': ticket.time_created,
-            'me': me
-        })
-    for review in reviews:
-        me = 1 if review.user == current_user else 0
-        combined.append({
-            'type': 'review',
-            'object': review,
-            'time_created': review.time_created,
-            'me': me
-        })
+    # # Merge into a single list
+    # combined = []
+    # for ticket in tickets:
+    #     me = 1 if ticket.user == current_user else 0
+    #     combined.append({
+    #         'type': 'ticket',
+    #         'object': ticket,
+    #         'time_created': ticket.time_created,
+    #         'me': me
+    #     })
+    # for review in reviews:
+    #     me = 1 if review.user == current_user else 0
+    #     combined.append({
+    #         'type': 'review',
+    #         'object': review,
+    #         'time_created': review.time_created,
+    #         'me': me
+    #     })
+    #
+    # combined.sort(key=lambda x: x['time_created'], reverse=True)
 
-    combined.sort(key=lambda x: x['time_created'], reverse=True)
+    # Pagination ticket
+    ticket_paginator = Paginator(tickets, 5)
+    ticket_page_number = request.GET.get('ticket_page')
+    ticket_page_obj = ticket_paginator.get_page(ticket_page_number)
+
+    # Pagination review
+    review_paginator = Paginator(reviews, 5)
+    review_page_number = request.GET.get('review_page')
+    review_page_obj = review_paginator.get_page(review_page_number)
 
     return render(request, 'reviews/feed.html',
-                  {'combined': combined})
+                  {
+                      # 'combined': combined,
+                      'ticket_page_obj': ticket_page_obj,
+                      'review_page_obj': review_page_obj,
+                      'current_user': current_user,
+                   })
 
 
 @login_required
@@ -460,8 +491,16 @@ def ticket_reviews(request, ticket_id):
     """
     ticket = get_object_or_404(Ticket, id=ticket_id)
     reviews = Review.objects.filter(ticket=ticket).order_by('-time_created')
+    # Pagination review
+    review_paginator = Paginator(reviews, 5)
+    review_page_number = request.GET.get('review_page')
+    review_page_obj = review_paginator.get_page(review_page_number)
     return render(request, 'reviews/ticket_reviews.html',
-                  {'ticket': ticket, 'reviews': reviews})
+                  {
+                      'ticket': ticket,
+                      # 'reviews': reviews,
+                      'reviews': review_page_obj,
+                  })
 
 
 @login_required

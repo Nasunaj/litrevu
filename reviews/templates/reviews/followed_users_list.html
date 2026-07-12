@@ -20,9 +20,9 @@
                     <ul>
                         {% for user in followed_users %}
                             <li>
-                                <p>{{ user.followed_user.username }}</p>
-                                <a href="{% url 'unfollow_user' user.followed_user.id %}" class="sign-up-btn">Se désabonner</a>
-                                <br><br>
+                                <p>{{user.followed_user.username}}
+                                    <a href="{% url 'unfollow_user' user.followed_user.id %}" class="sign-up-btn">Se désabonner</a>
+                                </p>
                             </li>
                         {% endfor %}
                     </ul>

@@ -8,49 +8,81 @@
             <div class="feed-container">
                 <div class="feed-column">
                     <h2>Billets</h2>
-                    {% if combined %}
-                        {% for item in combined %}
-                            {% if item.type == 'ticket' %}
-                            <div class="ticket">
-                                <h3>{{ item.object.title }}</h3>
-                                <p>{{ item.object.description }}</p>
-                                <p>Auteur : {{ item.object.user.username }}</p>
-                                <p>Créé le : {{item.object.time_created}}</p>
-                                {% if item.object.image %}
-                                    <img src="{{ item.object.image.url }}" alt="image du billet : {{ item.object.title }}" width="100">
+                {% if ticket_page_obj %}
+                    {% for ticket in ticket_page_obj %}
+                        <div class="ticket">
+                            <h3>{{ ticket.title }}</h3>
+                            <p class="p-description">{{ ticket.description }}</p>
+                                {% if ticket.image %}
+                                    <img src="{{ ticket.image.url }}" alt="image du billet : {{ ticket.title }}" width="100">
                                 {% endif %}
-                                    <p>
-                                        <a href="{% url 'ticket_reviews' ticket_id=item.object.id %}" class="sign-up-btn">Voir les critiques</a>
-                                    </p>
-                                <br><br>
-                            </div>
+                            <p class="date-author">Auteur : {{ ticket.user.username }}</p>
+                            <p class="date-author">Créé le : {{ticket.time_created}}</p>
+                            <p>
+                                <a href="{% url 'ticket_reviews' ticket_id=ticket.id %}" class="sign-up-btn">Voir les critiques</a>
+                            </p>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Pagination pour les billets -->
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if ticket_page_obj.has_previous %}
+                                <a href="?ticket_page=1">« Première</a>
+                                <a href="?ticket_page={{ ticket_page_obj.previous_page_number }}">Précédente</a>
                             {% endif %}
-                        {% endfor %}
+                            <span class="current">
+                                Page {{ ticket_page_obj.number }} sur {{ ticket_page_obj.paginator.num_pages }}
+                            </span>
+                            {% if ticket_page_obj.has_next %}
+                                <a href="?ticket_page={{ ticket_page_obj.next_page_number }}">Suivante</a>
+                                <a href="?ticket_page={{ ticket_page_obj.paginator.num_pages }}">Dernière »</a>
+                            {% endif %}
+                        </span>
+                    </div>
                     {% else %}
                     <p>Vide</p>
                     {% endif %}
                 </div>
                 <div class="feed-column">
                     <h2>Critiques</h2>
-                    {% if combined %}
-                        {% for item in combined %}
-                            {% if item.type == 'review' %}
-                                <div class="review">
-                                    <h3>{{ item.object.headline }}</h3>
-                                    <p>Note : {{ item.object.rating }}/5</p>
-                                    <p>{{ item.object.body }}</p>
-                                    <p>Auteur : {{ item.object.user.username }}</p>
-                                    <p>Pour le billet :
-                                        <a href="{% url 'ticket_reviews' ticket_id=item.object.ticket.id %}">{{ item.object.ticket.title }}</a>
-                                    </p>
-                                    <p>Créé le : {{item.object.time_created}}</p>
-                                    <br><br>
-                                </div>
-                            {% endif %}
+                    {% if review_page_obj %}
+                        {% for review in review_page_obj %}
+                            <div class="review">
+                                <h3>{{ review.ticket.title }}</h3>
+                                <p class="p-rating-date-author">
+                                    <span class="p-rating">{{ review.rating }}/5</span>
+                                    <span class="date-author">{{ review.user.username }}</span>
+                                    <span class="date-author">{{ review.time_created }}</span>
+                                </p>
+                                <h4>{{ review.headline }}</h4>
+                                <p class="p-description">{{ review.body }}</p>
+                                <p>
+                                    <a href="{% url 'ticket_reviews' ticket_id=review.ticket.id %}" class="sign-up-btn">Voir les critiques</a>
+                                </p>
+                            </div>
                         {% endfor %}
-                    {% else %}
-                    <p>Vide</p>
-                    {% endif %}
+                                        <!-- Pagination pour les billets -->
+                        <div class="pagination">
+                            <span class="step-links">
+                            {% if review_page_obj.has_previous %}
+                                <a href="?review_page=1">« Première</a>
+                                <a href="?review_page={{ review_page_obj.previous_page_number }}">Précédente</a>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ review_page_obj.number }} sur {{ review_page_obj.paginator.num_pages }}
+                            </span>
+
+                            {% if review_page_obj.has_next %}
+                                <a href="?review_page={{ review_page_obj.next_page_number }}">Suivante</a>
+                                <a href="?review_page={{ review_page_obj.paginator.num_pages }}">Dernière »</a>
+                            {% endif %}
+                            </span>
+                        </div>
+                        {% else %}
+                        <p>Vide</p>
+                        {% endif %}
                 </div>
             </div>
         </div>

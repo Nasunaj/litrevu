@@ -1,28 +1,48 @@
 {% extends 'authentification/base.html' %}
 
 {% block title %}Critiques pour {{ ticket.title }} - LITReview{% endblock %}
-{% block h1_title %}Critiques pour {{ ticket.title }}{% endblock %}
+{% block h1_title %}{{ ticket.title }} (critiques){% endblock %}
 {% block content %}
         <div class="content">
             <div class="right-session">
-                <h2>{{ ticket.title }}</h2>
+                <h2 class="ticket-title">{{ ticket.title }}</h2>
+                <div class="ticket ticket_and_review">
                  <p>{{ ticket.description }}</p>
-                <p>Auteur : {{ ticket.user.username }}</p>
-                <p>Créé le : {{ticket.time_created}}</p>
-                <h3>Critiques</h3>
+                    <p class="p-rating-date-author">
+                        <span class="date-author">{{ ticket.user.username }}</span>
+                        <span class="date-author">{{ ticket.time_created }}</span>
+                    </p>
+                </div>
                 {% if reviews %}
-                    <ul>
                         {% for review in reviews %}
-                        <li>
-                            <p>Note : {{ review.rating}}/5</p>
-                            <p>Titre : {{ review.headline }}</p>
-                            <p>{{ review.body }}</p>
-                            <p>Auteur : {{ review.user.username }}</p>
-                            <p>{{ review.time_created }}</p>
-                            <hr>
-                        </li>
+                            <div class="review">
+                                <p class="p-rating-date-author">
+                                    <span class="p-rating">{{ review.rating }}/5</span>
+                                    <span class="date-author">{{ review.user.username }}</span>
+                                    <span class="date-author">{{review.time_created}}</span>
+                                </p>
+                                <h4>{{ review.headline }}</h4>
+                                    <p class="p-description">{{ review.body }}</p>
+                            </div>
                         {% endfor %}
-                    </ul>
+                                                <!-- Pagination pour les billets -->
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if reviews.has_previous %}
+                                <a href="?review_page=1">« Première</a>
+                                <a href="?review_page={{ reviews.previous_page_number }}">Précédente</a>
+                            {% endif %}
+
+                            <span class="current">
+                                Page {{ reviews.number }} sur {{ reviews.paginator.num_pages }}
+                            </span>
+
+                            {% if reviews.has_next %}
+                                <a href="?review_page={{ reviews.next_page_number }}">Suivante</a>
+                                <a href="?review_page={{ reviews.paginator.num_pages }}">Dernière »</a>
+                            {% endif %}
+                        </span>
+                    </div>
                 {% else %}
                 <p>Aucune critique pour ce billet.</p>
                 {% endif %}
