@@ -231,6 +231,28 @@ def review_create(request):
         if form.is_valid():
             # The user is missing
             # so first we prepare the database without saving.
+
+            # Verification user wasn't blocked by the author of ticket
+            ticket = form.cleaned_data['ticket']
+            if BlockedUser.objects.filter(
+                user=request.user,
+                blocked_user=ticket.user
+            ).exists():
+                messages.error(request, "Vous ne pouvez pas critiquer"
+                                        " un billet d'un utilisateur que vous "
+                                        "avez bloqué.")
+                return redirect('review_create')
+
+            # Verification author of ticket didn't block the user
+            if BlockedUser.objects.filter(
+                user=ticket.user,
+                blocked_user=request.user
+            ).exists():
+                messages.error(request,
+                               f"{ticket.user.username} vous a bloqué."
+                               f" Vous ne pouvez pas critiquer ses billets.")
+                return redirect('review_create')
+
             review = form.save(commit=False)
             review.user = request.user  # we add user
             review.save()  # end we save
@@ -354,6 +376,26 @@ def follow_user(request, user_id):
                        "Il n'est pas possible de se suivre soi-même.")
         return redirect('user_list')
 
+    # Verification :if user to follow blocked current_user
+    if BlockedUser.objects.filter(
+        user=user_to_follow,
+        blocked_user=request.user
+    ).exists():
+        messages.error(request, f"Vous ne pouvez pas suivre "
+                                f"{user_to_follow.username} car il/elle vous "
+                                f"a bloqué.")
+        return redirect('user_list')
+
+    # Verification if current_user blocked user to follow
+    if BlockedUser.objects.filter(
+        user=request.user,
+        blocked_user=user_to_follow
+    ).exists():
+        messages.error(request, f"Vous ne pouvez pas suivre "
+                                f"{user_to_follow.username} car vous l'avez "
+                                f"bloqué.")
+        return redirect('user_list')
+
     if UserFollows.objects.filter(user=request.user,
                                   followed_user=user_to_follow).exists():
         messages.error(request,
@@ -425,17 +467,32 @@ def feed(request):
     # Users followed by current_user
     followed_users = current_user.following.values_list('followed_user',
                                                         flat=True)
+    # User blocked by current_user
+    blocked_users = BlockedUser.objects.filter(user=current_user).values_list(
+        'blocked_user', flat=True)
+
+    # users who was blocked by current_user
+    blocked_by = BlockedUser.objects.filter(
+        blocked_user=current_user).values_list('user', flat=True)
 
     # Tickets (current_user et users followed bu current_user)
     tickets = Ticket.objects.filter(
         Q(user=current_user) | Q(user__in=followed_users)
+    ).exclude(
+        Q(user__in=blocked_users) | Q(user__in=blocked_by)
     ).distinct().order_by('-time_created')
 
     # Reviews (from the current user, from users they follow,
     # and reviews of the current user's posts)
+    # reviews = Review.objects.filter(
+    #     Q(user=current_user) | Q(user__in=followed_users) |
+    #     Q(ticket__user=current_user)
+    # ).order_by('-time_created')
     reviews = Review.objects.filter(
-        Q(user=current_user) | Q(user__in=followed_users) |
-        Q(ticket__user=current_user)
+        Q(user=current_user) | Q(user__in=followed_users)
+    ).exclude(
+        Q(user__in=blocked_users) | Q(user__in=blocked_by) |
+        Q(ticket__user__in=blocked_users) | Q(ticket__user__in=blocked_by)
     ).order_by('-time_created')
 
     # # Merge into a single list
@@ -555,6 +612,15 @@ def block_user(request, user_id):
         follow_relationship.delete()
         messages.info(request, f"Vous avez été désabonné de "
                                f"{user_to_block.username}.")
+    # Reverse if blocked user follow user who blocked him so automatically
+    # unfollow for him too.
+    follow_relationship_reverse = UserFollows.objects.filter(
+        user=user_to_block, followed_user=request.user
+    ).first()
+    if follow_relationship_reverse:
+        follow_relationship_reverse.delete()
+        messages.info(request, f"{user_to_block.username} a été "
+                               f"désabonné de vous.")
 
     messages.success(request,
                      f"Vous avez bloqué {user_to_block.username}.")

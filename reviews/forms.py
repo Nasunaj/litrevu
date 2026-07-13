@@ -74,7 +74,11 @@ class ReviewForm(forms.ModelForm):
             # to avoid loading unnecessary data into RAM.
             # note: filter(), all(), and get() are selection methods
             # so they do not modify the original database.
-            self.fields['ticket'].queryset = Ticket.objects.filter(user=user)
+            # self.fields['ticket'].queryset = Ticket.objects.all().order_by(
+            #     '-time_created')
+            # with select_related only one requete (ORM Django)
+            tickets = Ticket.objects.select_related('user').order_by(
+                '-time_created')
             # Bound the scores with a minimum and a maximum.
             self.fields['rating'].validators.append(MinValueValidator(1))
             self.fields['rating'].validators.append(MaxValueValidator(5))
