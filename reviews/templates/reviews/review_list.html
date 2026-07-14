@@ -34,7 +34,9 @@
                         <div class="pagination">
                             <span class="step-links">
                             {% if reviews.has_previous %}
+                                {% if reviews.previous_page_number > 1 %}
                                 <a href="?review_page=1">« Première</a>
+                                {% endif %}
                                 <a href="?review_page={{ reviews.previous_page_number }}">Précédente</a>
                             {% endif %}
 
@@ -43,7 +45,9 @@
                             </span>
 
                             {% if reviews.has_next %}
+                                {% if reviews.next_page_number != reviews.paginator.num_pages %}
                                 <a href="?review_page={{ reviews.next_page_number }}">Suivante</a>
+                                {% endif %}
                                 <a href="?review_page={{ reviews.paginator.num_pages }}">Dernière »</a>
                             {% endif %}
                             </span>

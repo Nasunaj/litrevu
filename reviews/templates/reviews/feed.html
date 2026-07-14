@@ -28,14 +28,18 @@
                     <div class="pagination">
                         <span class="step-links">
                             {% if ticket_page_obj.has_previous %}
+                                {% if ticket_page_obj.previous_page_number > 1 %}
                                 <a href="?ticket_page=1">« Première</a>
+                                {% endif %}
                                 <a href="?ticket_page={{ ticket_page_obj.previous_page_number }}">Précédente</a>
                             {% endif %}
                             <span class="current">
                                 Page {{ ticket_page_obj.number }} sur {{ ticket_page_obj.paginator.num_pages }}
                             </span>
                             {% if ticket_page_obj.has_next %}
+                                {% if ticket_page_obj.next_page_number != ticket_page_obj.paginator.num_pages %}
                                 <a href="?ticket_page={{ ticket_page_obj.next_page_number }}">Suivante</a>
+                                {% endif %}
                                 <a href="?ticket_page={{ ticket_page_obj.paginator.num_pages }}">Dernière »</a>
                             {% endif %}
                         </span>
@@ -66,7 +70,9 @@
                         <div class="pagination">
                             <span class="step-links">
                             {% if review_page_obj.has_previous %}
+                                {% if review_page_obj.previous_page_number > 1 %}
                                 <a href="?review_page=1">« Première</a>
+                                {% endif %}
                                 <a href="?review_page={{ review_page_obj.previous_page_number }}">Précédente</a>
                             {% endif %}
 
@@ -75,7 +81,9 @@
                             </span>
 
                             {% if review_page_obj.has_next %}
+                                {% if review_page_obj.next_page_number != review_page_obj.paginator.num_pages %}
                                 <a href="?review_page={{ review_page_obj.next_page_number }}">Suivante</a>
+                                {% endif %}
                                 <a href="?review_page={{ review_page_obj.paginator.num_pages }}">Dernière »</a>
                             {% endif %}
                             </span>

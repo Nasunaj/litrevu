@@ -5,9 +5,6 @@
 {% block content %}
         <div class="content">
             <div class="right-session">
-                <a href="{% url 'user_list' %}" class="sign-up-btn">
-                    Trouver des utilisateurs
-                </a>
                 {% if messages %}
                     <div class="messages">
                         {% for message in messages %}

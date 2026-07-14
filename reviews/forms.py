@@ -77,8 +77,8 @@ class ReviewForm(forms.ModelForm):
             # self.fields['ticket'].queryset = Ticket.objects.all().order_by(
             #     '-time_created')
             # with select_related only one requete (ORM Django)
-            tickets = Ticket.objects.select_related('user').order_by(
-                '-time_created')
+            self.fields['ticket'].queryset = Ticket.objects.select_related(
+                'user').order_by('-time_created')
             # Bound the scores with a minimum and a maximum.
             self.fields['rating'].validators.append(MinValueValidator(1))
             self.fields['rating'].validators.append(MaxValueValidator(5))

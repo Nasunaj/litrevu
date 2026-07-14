@@ -33,7 +33,9 @@
                         <div class="pagination">
                             <span class="step-links">
                             {% if tickets.has_previous %}
+                                {% if tickets.previous_page_number > 1 %}
                                 <a href="?ticket_page=1">« Première</a>
+                                {% endif %}
                                 <a href="?ticket_page={{ tickets.previous_page_number }}">Précédente</a>
                             {% endif %}
 
@@ -42,7 +44,9 @@
                             </span>
 
                             {% if tickets.has_next %}
+                                {% if tickets.next_page_number != tickets.paginator.num_pages %}
                                 <a href="?ticket_page={{ tickets.next_page_number }}">Suivante</a>
+                                {% endif %}
                                 <a href="?ticket_page={{ tickets.paginator.num_pages }}">Dernière »</a>
                             {% endif %}
                             </span>
